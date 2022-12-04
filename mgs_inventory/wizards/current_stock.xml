@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+		<record id="current_stock_form" model="ir.ui.view">
+			<field name="name">mgs_inventory.current_stock.form</field>
+			<field name="model">mgs_inventory.current_stock</field>
+			<field name="arch" type="xml">
+				 <form>
+					<sheet>
+						<group>
+							<group>
+
+								<field name="date"   />
+								<field name="stock_location_ids" placeholder="All Locations" string="Warehouse" options="{'no_create': True}" widget="many2many_tags"/>
+                				<field name="company_id" groups="base.group_multi_company" />
+							</group>
+							<group>
+                				<field name="categ_id" string="Category" options="{'no_create': True}" />
+								<field name="product_id" string="Product" options="{'no_create': True}"/>
+							</group>
+						</group>
+
+            <!-- <group>
+              <field name="quant_ids" readonly = "1">
+                <tree>
+                  <field name="product_id"/>
+                  <field name="quantity"/>
+                  <field name="location_id"/>
+                </tree>
+              </field>
+            </group> -->
+					</sheet>
+
+				<footer>
+					<button name="confirm" string="PDF" type="object" class="oe_highlight"/>
+					<!-- <button name="export_to_excel" string="XLSX" type="object" class="oe_highlight"/> -->
+					<button string="Cancel" special="cancel"/>
+				</footer>
+
+				 </form>
+			</field>
+		</record>
+
+
+
+		<record id="action_current_stock_form" model="ir.actions.act_window">
+			<field name="name">MGS Current Stock Report</field>
+			<field name="res_model">mgs_inventory.current_stock</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="current_stock_form"/>
+			<field name="target">new</field>
+		</record>
+
+		<menuitem id="mgs_inventory_root" name="MGS-Inventory Reports" parent="stock.menu_warehouse_report" />
+		<menuitem id="menu_current_stock" name="Quantity on Hand by Location" parent="mgs_inventory_root" action="action_current_stock_form" sequence="1" />
+
+</odoo>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+		<record id="receipt_and_payment_form" model="ir.ui.view">
+			<field name="name">mgs_account.receipt_and_payment.form</field>
+			<field name="model">mgs_account.receipt_and_payment</field>
+			<field name="arch" type="xml">
+			   <form>
+					<sheet>
+						<group>
+							<group>
+								<field name="date_from" string = "From"/>
+								<field name="partner_id" options="{'no_create': True}" />
+								<field name="user_id" options="{'no_create': True}" />
+								<field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" />
+							</group>
+
+
+							<group>
+								<field name="date_to" string="To"/>
+								<field name="journal_id" options="{'no_create': True}" />
+								<field name="payment_type" widget="radio"/>
+							</group>
+						</group>
+					</sheet>
+
+				<footer>
+					<button name="confirm" string="View" type="object" class="oe_highlight"/>
+					<button string="Cancel" special="cancel"/>
+				</footer>
+
+			   </form>
+			</field>
+		</record>
+
+
+
+		<record id="action_receipt_and_payment_report" model="ir.actions.act_window">
+			<field name="name">MGS Payment and Receipt</field>
+			<field name="res_model">mgs_account.receipt_and_payment</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_id" ref="receipt_and_payment_form"/>
+			<field name="target">new</field>
+		</record>
+
+    <menuitem id="menu_receipt_and_payment_report" name="MGS Payment and Receipt" parent="menu_mgs_account_report" action="action_receipt_and_payment_report" sequence="2" />
+</odoo>

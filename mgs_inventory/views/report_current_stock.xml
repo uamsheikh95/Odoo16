@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<report
+		id="action_current_stock"
+		name="mgs_inventory.current_stock_report"
+		model="mgs_inventory.current_stock_report"
+		string="Quantity on Hand by Location"
+		report_type="qweb-html"
+		paperformat="mgs_inventory_paperformat"
+		/>
+		<!--  paperformat="paperformat_custom" -->
+
+
+		<template id="current_stock_report">
+			<t t-call="web.html_container">
+				<t t-foreach="docs" t-as="doc">
+					<t t-call="web.internal_layout" t-lang="en_US">
+						<div class="page">
+
+							<h2 class="text-center">Quantity on Hand by Location</h2>
+							<div id="informations" class="row mt2 mb2" style="width: 90%; margin: auto">
+								<div class="col-auto mw-100 mb-2" t-if="date" name="date" style="width: 20%; float: left;">
+									<strong>Date:</strong>
+									<p class="m-0" t-esc="date"/>
+								</div>
+
+								<!-- <div class="col-auto mw-100 mb-2" t-if="categ_name" name="categ_name" style="width: 20%; float: left;">
+									<strong>Category:</strong>
+									<p class="m-0" t-esc="categ_name"/>
+								</div> -->
+
+								<div class="col-auto mw-100 mb-2" t-if="product_name" name="product_name" style="width: 20%; float: left;">
+									<strong>Item:</strong>
+									<p class="m-0" t-esc="product_name"/>
+								</div>
+
+								<!-- <div class="col-auto mw-100 mb-2" t-if="location_ids"  style="width: 40%; float: left;">
+									<strong>Location:</strong> <br/>
+									<t t-foreach="location_ids" t-as="location">
+										<span style="padding: 2px; border: 1px solid black; border-radius: 3px;">
+											<span t-esc="location.location_id.name"/>/<span t-esc="location.name"/>
+										</span>
+										<br/>
+									</t>
+								</div> -->
+
+								<div class="col-auto mw-100 mb-2" t-if="date_to" name="due_date" style="width: 20%; float: left;" groups="base.group_multi_company">
+									<strong>Company:</strong>
+									<p class="m-0" t-esc="company_name"/>
+								</div>
+							</div>
+
+							<table style="width: 100%;width: 90%; margin: auto">
+								<thead>
+									<tr style="border-top: 1px solid black; boder-bottom: 1px solid black">
+										<th style="width: 10%;">Location</th>
+										<th>Item Code</th>
+										<th>Item Description</th>
+										<th class="text-right">On Hand</th>
+										<!-- <th class="text-right" scope="col">Value</th> -->
+									</tr>
+								</thead>
+								<tbody>
+									<t t-set="tot_qty_all" t-value="0"/>
+									<!-- <t t-set="tot_value" t-value="0"/> -->
+									<t t-foreach="location_ids" t-as="location">
+										<t t-set="tot_qty_location" t-value="0"/>
+										<tr style="border-top: 1px solid black; boder-bottom: 1px solid black;color: red" t-if="sum_qty(date, categ_id, product_id, location.id, company_id.id)">
+											<td colspan="4" ><span t-esc="location.location_id.name"/>/<span t-esc="location.name"/></td>
+										</tr>
+
+										<t t-foreach="product_ids" t-as="product">
+											<t t-set="qty" t-value="sum_qty(date, categ_id, product.id, location.id, company_id.id)"/>
+											<tr style="border-top: 1px solid; boder-bottom: 1px solid" t-if="qty">
+												<td></td>
+												<td><span t-esc="product.default_code"/></td>
+												<td><span t-esc="product.name"/></td>
+												<td class="text-right"><span t-esc="'{0:,.2f}'.format(qty)"/><t t-set="tot_qty_location" t-value="tot_qty_location+qty"/></td>
+											</tr>
+										</t>
+										<tr style="color: red" t-if="sum_qty(date, categ_id, product_id, location.id, company_id.id)">
+											<td colspan="2" style="border-top: 1px solid black; boder-bottom: 1px solid black;color: red">Total <span t-esc="location.location_id.name"/>/<span t-esc="location.name"/></td>
+											<td style="border-top: 1px solid black; boder-bottom: 1px solid black;color: red"></td>
+											<td class="text-right" style="border-top: 1px solid black; boder-bottom: 1px solid black;color: red">
+												<span t-esc="'{0:,.2f}'.format(tot_qty_location)"/>
+												<t t-set="tot_qty_all" t-value="tot_qty_all+tot_qty_location"/>
+											</td>
+										</tr>
+										<tr t-if="not stock_location_ids"><td style="height: 30px"/></tr>
+									</t>
+									<tr style="font-weight: bold; border-top: 2px solid #212529">
+										<td></td>
+										<td></td>
+										<td></td>
+										<td class="text-right"><span t-esc="'{0:,.2f}'.format(tot_qty_all)"/></td>
+									</tr>
+								</tbody>
+							</table>
+						</div> <!--page-->
+					</t> <!--web.external_layout-->
+				</t>
+			</t> <!--web.html_container-->
+		</template>
+	</odoo>

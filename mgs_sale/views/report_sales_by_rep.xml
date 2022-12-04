@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+        id="action_sales_by_rep"
+        name="mgs_sale.sales_by_rep_report"
+        model="mgs_sale.sales_by_rep_report"
+        string="MGS Sale Report"
+        report_type="qweb-html"
+        paperformat="mgs_sale_paperformat"
+        />
+        <!--  paperformat="paperformat_custom" -->
+
+
+        <template id="sales_by_rep_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.internal_layout" t-lang="en_US">
+                        <div class="page">
+                            <style>
+                                th, td {
+                                    padding: 0.30rem !important;
+                                    border-top: 1px solid #212529 !important;
+                                    border-bottom: 1px solid #212529 !important;
+                                }
+                            </style>
+
+                            <div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+                                <h2 style="margin-bottom: 0">MGS Sale Report</h2>
+
+                                <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+
+                                    <div class="col-3" t-if="date_from or date_to">
+                                        <strong>Date:</strong>
+                                        <p t-esc="date_from" style="margin-bottom: 0"/>
+                                        <p t-esc="date_to"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="product_id[0]">
+                                        <strong>Product:</strong>
+                                        <p class="m-0" t-esc="product_id[1]['en_US']"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="partner_id[0]">
+                                        <strong>Parter:</strong>
+                                        <p class="m-0" t-esc="partner_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="team_id[0]">
+                                        <strong>Salesteam:</strong>
+                                        <p class="m-0" t-esc="team_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="user_id[0]">
+                                        <strong>Salesperson:</strong>
+                                        <p class="m-0" t-esc="user_id[1]"/>
+                                    </div>
+
+                                    <div class="col-4" t-if="company_id"  groups="base.group_multi_company">
+                                        <strong>Company:</strong>
+                                        <p t-esc="company_id.name"/>
+                                    </div>
+
+
+                            </div>
+
+                            <table class="table table-condensed table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Order</th>
+                                        <th>Partner</th>
+                                        <th>Item</th>
+                                        <th class="text-center">Ordered Qty</th>
+                                        <th class="text-center">Delivered Qty</th>
+                                        <th class="text-center">Invoiced Qty</th>
+                                        <th class="text-center">To Invoice Qty</th>
+                                        <th class="text-right">Rate</th>
+                                        <th class="text-right">Amount</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <t t-set="total_product_uom_qty" t-value="0"/>
+                                    <t t-set="total_qty_delivered" t-value="0"/>
+                                    <t t-set="total_qty_invoiced" t-value="0"/>
+                                    <t t-set="total_qty_to_invoice" t-value="0"/>
+                                    <t t-set="total_amount" t-value="0"/>
+
+                                    <tr t-foreach="lines(date_from, date_to, company_id.id, product_id[0], partner_id[0], team_id[0], user_id[0])" t-as="line">
+                                        
+                                        <td nowrap="nowrap"><span t-esc="line['date']"/></td>
+                                        <td><span t-esc="line['order_no']"/></td>
+                                        <td><span t-esc="line['partner']"/></td>
+                                        <td><span t-esc="line['product_name']['en_US']"/></td>
+                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['product_uom_qty'])"/></td>
+                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['qty_delivered'])"/></td>
+                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['qty_invoiced'])"/></td>
+                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['qty_to_invoice'])"/></td>
+                                        <td class="text-right">
+                                            <t t-set="rate" t-value="0"/>
+                                            <t t-set="rate" t-value="line['price_total']/line['product_uom_qty']" t-if="line['product_uom_qty'] and line['price_total']"/>
+                                            <span t-esc="'{0:,.2f}'.format(rate)"/>
+                                        </td>
+                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['price_total'])" t-if="line['price_total']"/></td>
+
+                                        <t t-set="total_product_uom_qty" t-value="total_product_uom_qty+line['product_uom_qty']"/>
+                                        <t t-set="total_qty_delivered" t-value="total_qty_delivered+line['qty_delivered']"/>
+                                        <t t-set="total_qty_invoiced" t-value="total_qty_invoiced+line['qty_invoiced']"/>
+                                        <t t-set="total_qty_to_invoice" t-value="total_qty_to_invoice+line['qty_to_invoice']"/>
+                                        <t t-set="total_amount" t-value="total_amount+line['price_total']"/>
+                                    </tr>
+
+                                    <tr>
+                                        <td nowrap="nowrap"></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(total_product_uom_qty)"/></td>
+                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(total_qty_delivered)"/></td>
+                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(total_qty_invoiced)"/></td>
+                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(total_qty_to_invoice)"/></td>
+                                        <td class="text-right"></td>
+                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(total_amount)"/></td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div> <!--container-->
+                    </div> <!--page-->
+                </t> <!--web.external_layout-->
+            </t>
+        </t> <!--web.html_container-->
+    </template>
+</odoo>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="account_statement_form" model="ir.ui.view">
+			<field name="name">mgs_account.account_statement.form</field>
+			<field name="model">mgs_account.account_statement</field>
+			<field name="arch" type="xml">
+			   <form>
+             <group>
+               <group>
+                 <field name="date_from" string = "From Date" required="1" />
+                 <field name="account_id" string = "Account" options="{'no_create': True}" />
+                 <field name="company_id" groups="base.group_multi_company" />
+                 <field name="target_moves" widget="radio" />
+               </group>
+
+               <group>
+                 <field name="date_to" string="To Date" required="1" />
+                 <field name="analytic_account_id" string = "Analytic Account" options="{'no_create': True}" />
+                 <field name="report_by" widget="radio" />
+               </group>
+             </group>
+
+
+             <footer>
+               <button name="check_report" string="View" type="object" class="oe_highlight"/>
+               <button string="Cancel" special="cancel"/>
+             </footer>
+			   </form>
+			</field>
+		</record>
+
+    <record id="action_account_statement_form" model="ir.actions.act_window">
+			<field name="name">MGS Account Statement Report</field>
+			<field name="res_model">mgs_account.account_statement</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="account_statement_form"/>
+			<field name="target">new</field>
+		</record>
+
+		<menuitem id="menu_account_ledger" name="Account Statement" parent="menu_mgs_account_report" action="action_account_statement_form" />
+</odoo>

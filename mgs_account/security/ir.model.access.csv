@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mgs_account_account_statement,mgs_account.account_statement,model_mgs_account_account_statement,,1,1,1,1
+access_mgs_account_gross_profit,mgs_account.gross_profit,model_mgs_account_gross_profit,,1,1,1,1
+access_mgs_account_invoices_by_item,mgs_account.invoices_by_item,model_mgs_account_invoices_by_item,,1,1,1,1
+access_mgs_account_invoices_by_partner,mgs_account.invoices_by_partner,model_mgs_account_invoices_by_partner,,1,1,1,1
+access_mgs_account_invoice_detail,mgs_account.invoice_detail,model_mgs_account_invoice_detail,,1,1,1,1
+access_mgs_account_receipt_and_payment,mgs_account.receipt_and_payment,model_mgs_account_receipt_and_payment,,1,1,1,1

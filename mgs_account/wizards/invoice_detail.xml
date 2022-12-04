@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+		<record id="invoice_detail_form" model="ir.ui.view">
+			<field name="name">mgs_account.invoice_detail.form</field>
+			<field name="model">mgs_account.invoice_detail</field>
+			<field name="arch" type="xml">
+			   <form>
+					<sheet>
+						<group>
+							<group>
+								<field name="date_from" string = "From"/>
+								<field name="partner_id" options="{'no_create': True}" />
+								<field name="team_id" options="{'no_create': True}" />
+								<field name="payment_term_id" options="{'no_create': True}" />
+								<field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" />
+							</group>
+
+
+							<group>
+								<field name="date_to" string="To"/>
+								<field name="product_id" options="{'no_create': True}" />
+								<field name="user_id" options="{'no_create': True}" />
+								<field name="invoices_bills" required="1"/>
+								<field name="report_by" widget="radio"/>
+							</group>
+						</group>
+					</sheet>
+
+				<footer>
+					<button name="confirm" string="View" type="object" class="oe_highlight"/>
+					<button string="Cancel" special="cancel"/>
+				</footer>
+
+			   </form>
+			</field>
+		</record>
+
+
+
+		<record id="action_invoice_detail_report" model="ir.actions.act_window">
+			<field name="name">MGS Invoices Detail</field>
+			<field name="res_model">mgs_account.invoice_detail</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_id" ref="invoice_detail_form"/>
+			<field name="target">new</field>
+		</record>
+
+
+    <menuitem id="menu_invoice_detail_report" name="MGS Invoice Report" parent="menu_mgs_account_report" action="action_invoice_detail_report" sequence="2" />
+
+</odoo>

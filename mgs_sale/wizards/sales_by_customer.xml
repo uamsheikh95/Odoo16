@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+		<record id="sales_by_customer_form" model="ir.ui.view">
+			<field name="name">mgs_sale.sales_by_customer.form</field>
+			<field name="model">mgs_sale.sales_by_customer</field>
+			<field name="arch" type="xml">
+			   <form>
+					<sheet>
+						<group>
+							<group>
+								<field name="date_from" string = "From"/>
+								<field name="partner_id" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True}" />
+                                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" />
+							</group>
+
+
+							<group>
+								<field name="date_to" string="To"/>
+								<field name="user_id" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True}" />
+								<field name="report_by" widget="radio"/>
+							</group>
+						</group>
+					</sheet>
+
+				<footer>
+					<button name="confirm" string="View" type="object" class="oe_highlight"/>
+					<button string="Cancel" special="cancel"/>
+				</footer>
+
+			   </form>
+			</field>
+		</record>
+
+
+
+		<record id="action_sales_by_customer_report" model="ir.actions.act_window">
+			<field name="name">Generate Sales by Customer Report</field>
+			<field name="res_model">mgs_sale.sales_by_customer</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_id" ref="sales_by_customer_form"/>
+			<field name="target">new</field>
+		</record>
+
+
+	<menuitem id="menu_mgs_sale_report" name="MGS-Sale Reports" parent="sale.menu_sale_report"  />
+    <menuitem id="menu_sale_by_customer_report" name="Sales by Customer" parent="menu_mgs_sale_report" action="action_sales_by_customer_report" sequence="1" />
+
+</odoo>

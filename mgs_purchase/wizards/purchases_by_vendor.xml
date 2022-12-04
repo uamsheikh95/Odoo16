@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+		<record id="purchases_by_vendor_form" model="ir.ui.view">
+			<field name="name">mgs_purchase.purchases_by_vendor.form</field>
+			<field name="model">mgs_purchase.purchases_by_vendor</field>
+			<field name="arch" type="xml">
+			   <form>
+					<sheet>
+						<group>
+							<group>
+								<field name="date_from" string = "From" required="1" />
+								<field name="partner_id" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True}" />
+                                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" />
+							</group>
+
+
+							<group>
+								<field name="date_to" string="To" required="1" />
+								<field name="report_by" widget="radio"/>
+							</group>
+						</group>
+					</sheet>
+
+				<footer>
+					<button name="confirm" string="View" type="object" class="oe_highlight"/>
+					<button string="Cancel" special="cancel"/>
+				</footer>
+
+			   </form>
+			</field>
+		</record>
+
+
+
+		<record id="action_purchases_by_vendor_report" model="ir.actions.act_window">
+			<field name="name">MGS Purchases by Vendor Report</field>
+			<field name="res_model">mgs_purchase.purchases_by_vendor</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_id" ref="purchases_by_vendor_form"/>
+			<field name="target">new</field>
+		</record>
+
+
+	<menuitem id="menu_mgs_purchase_report" name="MGS-Purchase Reports" parent="purchase.purchase_report_main"  />
+    <menuitem id="menu_purchase_by_vendor_report" name="Purchases by Vendor" parent="menu_mgs_purchase_report" action="action_purchases_by_vendor_report" sequence="1" />
+
+</odoo>
