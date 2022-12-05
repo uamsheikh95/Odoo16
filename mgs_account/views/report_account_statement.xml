@@ -1,43 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <report
+    <!-- <report
         id="action_report_account_statement"
         name="mgs_account.account_statement_report"
         model="mgs_account.account_statement_report"
         string="Account Statement"
         report_type="qweb-html"
-        />
+        /> -->
 
-        <template id="account_statement_report">
-            <t t-call="web.html_container">
-                <t t-foreach="docs" t-as="doc">
-                    <t t-call="web.internal_layout" t-lang="en_US">
-                        <div class="page">
+    <record id="action_report_account_statement" model="ir.actions.report">
+        <field name="name">Account Statement</field>
+        <field name="model">mgs_account.account_statement_report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mgs_account.account_statement_report</field>
+        <field name="report_file">mgs_account.account_statement_report</field>
+        <field name="binding_model_id" ref="model_mgs_account_account_statement"/>
+        <field name="binding_type">report</field>
+    </record>
 
-                            <div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
-                                <h2>Account Statement</h2>
+    <template id="account_statement_report">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.internal_layout" t-lang="en_US">
+                    <div class="page">
+                        <div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+                            <h2>Account Statement</h2>
 
-                                <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
-
-                                    <div class="col-3" t-if="date_from or date_to">
-                                        <strong>Date:</strong>
-                                        <p t-esc="date_from" style="margin-bottom: 0"/>
-                                        <p t-esc="date_to"/>
-                                    </div>
-
-
-                                    <div class="col-3" t-if="partner_name">
-                                        <strong>Partner:</strong>
-                                        <p class="m-0" t-esc="partner_id[1]"/>
-                                    </div>
-
-                                    <div class="col-4" t-if="company_id"  groups="base.group_multi_company">
-                                        <strong>Company:</strong>
-                                        <span style="border: 1px solid black; padding: 1px; border-radius: 4px; background: #eeebeb; margin-right: 2px " t-esc="company_id.name"/>
-                                    </div>
+                            <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+                                <div class="col-3" t-if="date_from or date_to">
+                                    <strong>Date:</strong>
+                                    <p t-esc="date_from" style="margin-bottom: 0"/>
+                                    <p t-esc="date_to"/>
+                                </div>
 
 
+                                <div class="col-3" t-if="partner_name">
+                                    <strong>Partner:</strong>
+                                    <p class="m-0" t-esc="partner_id[1]"/>
+                                </div>
+
+                                <div class="col-4" t-if="company_id"  groups="base.group_multi_company">
+                                    <strong>Company:</strong>
+                                    <span style="border: 1px solid black; padding: 1px; border-radius: 4px; background: #eeebeb; margin-right: 2px " t-esc="company_id.name"/>
+                                </div>
                             </div>
 
                             <table class="table table-condensed table-sm">
@@ -82,21 +88,6 @@
                                                 <td nowrap="nowrap" style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right"><span t-esc="'{0:,.2f}'.format(balance)"/></td>
                                             </tr>
                                         </t>
-
-                                        <!-- <tr t-if="report_by == 'detail'" style="font-weight: bold">
-                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" colspan="6">
-                                                <span style="color: red; font-weight: bold;" t-if="report_by == 'detail'">BALANCE ON DATE</span>
-                                            </td>
-                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" class="text-right">
-
-                                            </td>
-                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" class="text-right">
-
-                                            </td>
-                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" class="text-right">
-                                                <span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(balance-open_balance)"/>
-                                            </td>
-                                        </tr> -->
 
                                         <tr style="font-weight: bold">
                                             <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" colspan="6">
