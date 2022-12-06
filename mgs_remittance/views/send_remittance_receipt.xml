@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <report
+        id="action_sender_remittance_receipt"
+        name="mgs_remittance.sender_remittance_receipt"
+        model="mgs_remittance.transaction"
+        string="Send Remittance Receipt"
+        report_type="qweb-html"
+        />
+
+        <template id="sender_remittance_receipt">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout" t-lang="en_US">
+                        <div class="page">
+                          <style>
+                              .table-sm > thead > tr > th {
+                                  border-top: 2px solid #212529 !important;
+                                  border-bottom: 2px solid #212529 !important;
+                              }
+
+                              .table-sm > tbody > tr > td {
+                                  border-top: 1px solid #7d7d7d;
+                              }
+                          </style>
+
+                          <div class="container" style="font-size:12px;font-family:Arial">
+                              <div class="row" style="font-size: 1.2em; font-family: 'Lato-Reg'">
+
+                                  <div class="col-7">
+                                      <div style="padding: 5px 0"><strong>SENDER:</strong><span t-field="doc.sender_id.name"/></div>
+                                      <div style="padding: 5px 0"><strong>Mobile:</strong><span t-field="doc.s_mobile"/></div>
+                                      <div style="padding: 5px 0"><strong>City:</strong><span t-field="doc.s_city_id.name"/></div>
+                                  </div>
+
+                                  <div class="col-5">
+                                    <h1 style="font-size: 2rem;white-space: nowrap;">Send Remittance Receipt</h1>
+
+                                    <div style="padding: 5px 0;border-top: 1.9px dashed;"><strong>Voucher No:</strong><span t-field="doc.name"/></div>
+                                    <div style="padding: 5px 0"><strong>Date:</strong><span t-field="doc.date"/></div>
+                                    <div style="padding: 5px 0;border-bottom: 1.9px dashed;"><strong>Teller:</strong><span t-field="user.name"/></div>
+                                  </div>
+                              </div>
+
+                            <h2 style="font-size: 1rem;white-space: nowrap;font-weight: bold;">Transaction Details</h2>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>RID</th>
+                                        <th>verification Code</th>
+                                        <th>Receiver Name</th>
+                                        <th>Receiver Mobile</th>
+                                        <th>City</th>
+                                        <th class="text-right">Amount</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <tr t-foreach="doc.transaction_line_ids" t-as="transaction">
+                                        <td><span t-field="transaction.id"/></td>
+                                        <td></td>
+                                        <td><span t-field="transaction.beneficiary_id.name"/></td>
+                                        <td><span t-field="transaction.b_mobile"/></td>
+                                        <td><span t-field="transaction.b_city_id.name"/></td>
+                                        <td class="text-right"><span t-field="transaction.total"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div> <!--container-->
+                    </div> <!--page-->
+                </t> <!--web.external_layout-->
+            </t>
+        </t> <!--web.html_container-->
+    </template>
+</odoo>

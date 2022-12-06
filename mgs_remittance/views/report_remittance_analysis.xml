@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+        id="action_remittance_analysis_report"
+        name="mgs_remittance.remittance_analysis_report"
+        model="mgs_remittance.remittance_analysis_report"
+        string="MGS Remittance Analysis Report"
+        report_type="qweb-html"
+        />
+
+        <template id="remittance_analysis_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.internal_layout" t-lang="en_US">
+                        <div class="page">
+                            <style>
+                                th, td {
+                                    padding: 0.30rem !important;
+                                    border-top: 1px solid #212529 !important;
+                                    border-bottom: 1px solid #212529 !important;
+                                }
+                            </style>
+
+                            <div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+                                <h1>Remittances</h1>
+
+                                <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+
+                                    <div class="col-3" t-if="from_date">
+                                        <strong>From Date:</strong>
+                                        <p t-esc="from_date"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="to_date">
+                                        <strong>To Date:</strong>
+                                        <p t-esc="to_date"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="source_company_company_id">
+                                        <strong>Source Agent:</strong>
+                                        <p class="m-0" t-esc="source_company_company_id.name"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="destination_company_partner_id[0]">
+                                        <strong>Destination Agent:</strong>
+                                        <p class="m-0" t-esc="destination_company_partner_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="sender_id[0]">
+                                        <strong>Sender:</strong>
+                                        <p class="m-0" t-esc="sender_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="beneficiary_id[0]">
+                                        <strong>Beneficiary:</strong>
+                                        <p class="m-0" t-esc="beneficiary_id[1]"/>
+                                    </div>
+                                </div>
+
+                            <table class="table table-condensed table-sm">
+                                <thead>
+                                    <tr>
+                                        <th nowrap="nowrap">Send Date</th>
+                                        <th nowrap="nowrap">REM ID</th>
+                                        <th nowrap="nowrap">Source Branch</th>
+                                        <th nowrap="nowrap">Destination Branch</th>
+                                        <th nowrap="nowrap">Sender</th>
+                                        <th nowrap="nowrap">Beneficiary</th>
+                                        <th class="text-right">Amount</th>
+                                        <th class="text-right">Due</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <t t-set="total_due" t-value="0"/>
+                                    <t t-set="total_amount" t-value="0"/>
+                                    <tr t-foreach="lines(source_company_company_id.id, destination_company_partner_id[0], sender_id[0], beneficiary_id[0], from_date, to_date)" t-as="line">
+                                        <td nowrap="nowrap"><span t-esc="line['send_date']"/></td>
+                                        <td nowrap="nowrap"><span t-esc="line['rid']"/></td>
+                                        <td><span t-esc="line['source_branch']"/></td>
+                                        <td><span t-esc="line['destination_branch']"/></td>
+                                        <td><span t-esc="line['sender_name']"/></td>
+                                        <td><span t-esc="line['beneficiary_name']"/></td>
+                                        <td class="text-right"><span t-esc="line['amount']"/></td>
+                                        <td class="text-right"><span t-esc="line['amount_due']"/></td>
+
+                                        <t t-set="total_due" t-value="total_due+line['amount_due']"/>
+                                        <t t-set="total_amount" t-value="total_amount+line['amount']"/>
+                                    </tr>
+
+                                    <tr style="font-weight: bold;font-size: 13px">
+                                        <td colspan="6"></td>
+                                        <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(total_amount)"/></td>
+                                        <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(total_due)"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div> <!--container-->
+                    </div> <!--page-->
+                </t> <!--web.external_layout-->
+            </t>
+        </t> <!--web.html_container-->
+    </template>
+</odoo>

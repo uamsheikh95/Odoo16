@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+        id="action_payout_voucher_receipt"
+        name="mgs_remittance.payout_voucher_receipt"
+        model="mgs_remittance.transaction.line"
+        string="Payout Voucher"
+        report_type="qweb-html"
+        />
+
+        <template id="payout_voucher_receipt">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout" t-lang="en_US">
+                        <div class="page">
+                          <style>
+                              td {
+                                  border: 1.2px solid #7d7d7d !important;
+                              }
+                          </style>
+
+                          <div class="container" style="font-size:12px;font-family:Arial">
+                            <h1 class="text-center">Payout Voucher</h1>
+                            
+                            <table class="table table-bordered table-sm">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Remit ID</strong></td>
+                                        <td><span t-esc="doc.related_transaction_id_no"/></td>
+
+                                        <td><strong>Date</strong></td>
+                                        <td><span t-esc="doc.create_date"/></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><strong>Remit Date</strong></td>
+                                        <td><span t-esc="doc.create_date"/></td>
+
+                                        <td><strong>Sender</strong></td>
+                                        <td><span t-esc="doc.sender_id.name"/></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><strong>Benf Name</strong></td>
+                                        <td colspan="3"><span t-esc="doc.beneficiary_id.name"/></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><strong>From</strong></td>
+                                        <td><span t-esc="doc.source_company_partner_id.name"/></td>
+
+                                        <td><strong>To</strong></td>
+                                        <td><span t-esc="doc.destination_company_partner_id.name"/></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><strong>Pay Amount</strong></td>
+                                        <td><span t-esc="doc.total"/></td>
+
+                                        <td><strong>Your Due Amount</strong></td>
+                                        <td><span t-esc="doc.beneficiary_id.partner_id.credit"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="row" style="padding-top: 2rem;">
+                                <div class="col-6 col-md-6">
+                                    <strong>Cashier</strong>________________________________
+                                </div>
+
+                                <div class="col-6 col-md-6 text-right">
+                                    <strong>Cashier</strong>________________________________
+                                </div>
+                            </div>
+                            
+                            <div class="row" style="border-top: 1px dashed;margin: 3rem 0;"></div>
+
+                            <!-- +++++++++++++++++++++++++++++++++++++++ COPY +++++++++++++++++++++++++++++++++++++++ -->
+                            <h1 class="text-center" style="font-size: 2rem">Payout Voucher (Copy)</h1>
+                            
+                            <table class="table table-bordered table-sm">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Remit ID</strong></td>
+                                        <td><span t-esc="doc.related_transaction_id_no"/></td>
+
+                                        <td><strong>Date</strong></td>
+                                        <td><span t-esc="doc.create_date"/></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><strong>Remit Date</strong></td>
+                                        <td><span t-esc="doc.remit_date"/></td>
+
+                                        <td><strong>Sender</strong></td>
+                                        <td><span t-esc="doc.sender_id.name"/></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><strong>Benf Name</strong></td>
+                                        <td colspan="3"><span t-esc="doc.beneficiary_id.name"/></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><strong>From</strong></td>
+                                        <td><span t-esc="doc.source_company_partner_id.name"/></td>
+
+                                        <td><strong>To</strong></td>
+                                        <td><span t-esc="doc.destination_company_partner_id.name"/></td>
+                                    </tr>
+
+                                    <tr>
+                                        <td><strong>Pay Amount</strong></td>
+                                        <td><span t-esc="doc.amount"/></td>
+
+                                        <td><strong>Your Due Amount</strong></td>
+                                        <td><span t-esc="doc.amount_due"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="row" style="padding-top: 2rem;">
+                                <div class="col-6 col-md-6">
+                                    <strong>Cashier</strong>________________________________
+                                </div>
+
+                                <div class="col-6 col-md-6 text-right">
+                                    <strong>Cashier</strong>________________________________
+                                </div>
+                            </div>
+                        </div> <!--container-->
+                    </div> <!--page-->
+                </t> <!--web.external_layout-->
+            </t>
+        </t> <!--web.html_container-->
+    </template>
+
+        
+</odoo>

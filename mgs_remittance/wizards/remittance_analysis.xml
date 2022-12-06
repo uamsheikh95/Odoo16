@@ -1,0 +1,33 @@
+<odoo>
+     <record id="remittance_analysis_wizard_form" model="ir.ui.view">
+            <field name="name">mgs_remittance.remittance_analysis.wiz</field>
+            <field name="model">mgs_remittance.remittance_analysis</field>
+            <field name="arch" type="xml">
+                <form string="Remittance Analysis Report Form">
+                    <group>
+                        <group>
+                            <field name="source_company_company_id" options="{'no_create': True}"/>
+                            <field name="from_date"/>
+                            <field name="sender_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="destination_company_partner_id" options="{'no_create': True}"/>
+                            <field name="to_date"/>
+                            <field name="beneficiary_id" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="check_report" string="View" type="object" class="oe_highlight"/>
+                        <button string="Close" class="btn-default" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_remittance_analysis_wizard">
+      <field name="name">Mgs Remittance Remittance Analysis Report</field>
+      <field name="res_model">mgs_remittance.remittance_analysis</field>
+      <field name="view_id" ref="remittance_analysis_wizard_form"/>
+      <field name="target">new</field>
+    </record>
+</odoo>
