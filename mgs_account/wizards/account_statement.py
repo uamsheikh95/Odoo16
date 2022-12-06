@@ -9,8 +9,9 @@ class AccountStatement(models.TransientModel):
 
     account_id = fields.Many2one('account.account', string="Account")
     partner_id = fields.Many2many('res.partner', string="Partner")
-    analytic_account_id = fields.Many2one(
-        'account.analytic.account', 'Analytic Account')
+    # analytic_account_id = fields.Many2one(
+    #     'account.analytic.account', 'Analytic Account')
+    analytic_distribution = fields.Json()
     date_from = fields.Date(
         'From  Date', default=lambda self: fields.Date.today().replace(day=1))
     date_to = fields.Date('To  Date', default=lambda self: fields.Date.today())
@@ -31,7 +32,7 @@ class AccountStatement(models.TransientModel):
                 'company_id': [self.company_id.id, self.company_id.name],
                 'partner_id': [self.partner_id.id, self.partner_id.name],
                 'account_id': [self.account_id.id, self.account_id.name],
-                'analytic_account_id': [self.analytic_account_id.id, self.analytic_account_id.name],
+                'analytic_distribution': self.analytic_distribution,
                 'date_from': self.date_from,
                 'date_to': self.date_to,
                 'report_by': self.report_by,
@@ -46,7 +47,7 @@ class AccountStatementReport(models.AbstractModel):
     _name = 'report.mgs_account.account_statement_report'
     _description = 'Account Statement Report'
 
-    def _lines(self, company_id, date_from, date_to, account_id, partner_id, analytic_account_id, target_moves, is_it_group):
+    def _lines(self, company_id, date_from, date_to, account_id, partner_id, analytic_distribution, target_moves, is_it_group):
         params = []
         states = """('posted','draft')"""
         if target_moves == 'posted':
@@ -67,7 +68,7 @@ class AccountStatementReport(models.AbstractModel):
             select aml.id, aml.date as date, aml.move_id as move_id, aj.name as voucher_type,
             rp.name as partner_name, aml.name as label, aml.ref as ref, am.name as voucher_no,
             aml.partner_id, aml.account_id, aml.debit as debit, aml.credit as credit,
-            aaa.name as analytic_account_name, am.ref as move_ref
+            aml.analytic_distribution as analytic_account_name, am.ref as move_ref
             """
 
             order_query = """
@@ -80,7 +81,6 @@ class AccountStatementReport(models.AbstractModel):
         left join res_partner as rp on aml.partner_id=rp.id
         left join account_move as am on aml.move_id=am.id
         left join account_journal as aj on aml.journal_id=aj.id
-        left join account_analytic_account as aaa on aml.analytic_account_id=aaa.id
         where am.state in """ + states
 
         if date_from:
@@ -94,9 +94,9 @@ class AccountStatementReport(models.AbstractModel):
         if account_id:
             from_where_query += """ and aml.account_id = """ + str(account_id)
 
-        if analytic_account_id:
-            from_where_query += """ and aml.analytic_account_id = """ + \
-                str(analytic_account_id)
+        if analytic_distribution:
+            from_where_query += """ and aml.analytic_distribution = """ + \
+                str(analytic_distribution)
 
         if partner_id:
             from_where_query += """ and aml.partner_id = """ + str(partner_id)
@@ -110,7 +110,7 @@ class AccountStatementReport(models.AbstractModel):
         res = self.env.cr.dictfetchall()
         return res
 
-    def _sum_open_balance(self, company_id, date_from, account_id, analytic_account_id, partner_id, target_moves):
+    def _sum_open_balance(self, company_id, date_from, account_id, analytic_distribution, partner_id, target_moves):
         states = """('posted','draft')"""
         if target_moves == 'posted':
             states = """('posted')"""
@@ -123,9 +123,9 @@ class AccountStatementReport(models.AbstractModel):
             where aml.account_id = %s and aml.date < %s and am.state in """ + states + """
             and aml.company_id = %s"""
 
-        if analytic_account_id:
-            query += """ and aml.analytic_account_id = """ + \
-                str(analytic_account_id)
+        if analytic_distribution:
+            query += """ and aml.analytic_distribution = """ + \
+                str(analytic_distribution)
 
         if partner_id:
             query += """ and aml.partner_id = """ + str(partner_id)
@@ -154,7 +154,7 @@ class AccountStatementReport(models.AbstractModel):
             'company_id': self.env['res.company'].search([('id', '=', data['form']['company_id'][0])]),
             'report_by': data['form']['report_by'],
             'target_moves': data['form']['target_moves'],
-            'analytic_account_id': data['form']['analytic_account_id'],
+            'analytic_distribution': data['form']['analytic_distribution'],
             'partner_id': data['form']['partner_id'],
             'sum_open_balance': self._sum_open_balance,
             'lines': self._lines,
