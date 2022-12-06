@@ -12,6 +12,7 @@ class AccountStatement(models.TransientModel):
     # analytic_account_id = fields.Many2one(
     #     'account.analytic.account', 'Analytic Account')
     analytic_distribution = fields.Json()
+    analytic_precision = fields.Integer()
     date_from = fields.Date(
         'From  Date', default=lambda self: fields.Date.today().replace(day=1))
     date_to = fields.Date('To  Date', default=lambda self: fields.Date.today())
