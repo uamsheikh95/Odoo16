@@ -142,7 +142,7 @@ class MGSRemittanceTransaction(models.Model):
             r.approved_by = self.env.user
             r.approve_date = fields.Datetime.now()
 
-    def _prepare_move_values(self, journal_id, company_id, date, ref):
+    def _prepare_move_values(self, journal_id, company_id, date, ref, currency_id):
         """
         This function prepares move values related to a remittance transaction
         """
@@ -153,6 +153,7 @@ class MGSRemittanceTransaction(models.Model):
             'company_id': company_id,
             'date': date,
             'ref': ref,
+            'currency_id': currency_id,
             # force the name to the default value, to avoid an eventual 'default_name' in the context
             # to set it to '' which cause no number to be given to the account.move when posted.
             'name': '/',
@@ -313,13 +314,14 @@ class MGSRemittanceTransaction(models.Model):
             transaction_line_ids = r.transaction_line_ids
             company_id = r.company_id.id
             date = r.date
+            currency_id = r.currency_id.id
             # ref = self.name
 
             for line in r.transaction_line_ids:
                 ref = 'RID: %s' % str(line.id)
                 journal_id = line.journal_id
                 move_vals = r._prepare_move_values(
-                    journal_id, company_id, date, ref)
+                    journal_id, company_id, date, ref, currency_id)
                 move_line_vals = r._prepare_move_line_values(line)
 
                 move = self.env['account.move'].with_context(
@@ -646,7 +648,7 @@ class MGSRemittanceTransactionLine(models.Model):
         ransaction_obj = self.env['mgs_remittance.transaction']
         for r in self:
             move_vals = ransaction_obj._prepare_move_values(
-                journal_id, company_id, date, ref)
+                journal_id, company_id, date, ref, currency_id)
 
             # Move_line vals:
             line_ids = r._prepare_move_line_values(
