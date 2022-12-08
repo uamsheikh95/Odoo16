@@ -82,8 +82,8 @@ class SalesByCustomerDetailReport(models.AbstractModel):
         if is_group == 'no':
             select = """
             select sr.date, sr.name as order_no, pt.name as product, salesperson.name as salesperson,
-            sr.product_uom_qty, sr.qty_delivered, sr.qty_invoiced, sr.qty_to_invoice, sr.price_total,
-            sr.state, sr.price_total-sr.margin as cost, sr.margin
+            COALESCE(sr.product_uom_qty, 0), COALESCE(sr.qty_delivered, 0), COALESCE(sr.qty_invoiced, 0), COALESCE(sr.qty_to_invoice, 0), COALESCE(sr.price_total, 0),
+            sr.state, COALESCE(sr.price_total-sr.margin, 0) as cost, COALESCE(sr.margin, 0)
             """
 
             order = """

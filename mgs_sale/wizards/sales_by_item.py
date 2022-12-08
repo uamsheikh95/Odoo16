@@ -1,15 +1,19 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 
+
 class SalesbyItemDetail(models.TransientModel):
     _name = 'mgs_sale.sales_by_item'
     _description = 'Sales by Item'
 
     product_id = fields.Many2one('product.product', string="Product")
-    date_from = fields.Date('From', default =  lambda self: fields.Date.today().replace(day=1))
-    date_to = fields.Date('To', default =  lambda self: fields.Date.today())
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.user.company_id.id)
-    report_by = fields.Selection([('Summary', 'Summary'), ('Detail', 'Detail')], string='Report Type', default='Detail')
+    date_from = fields.Date(
+        'From', default=lambda self: fields.Date.today().replace(day=1))
+    date_to = fields.Date('To', default=lambda self: fields.Date.today())
+    company_id = fields.Many2one(
+        'res.company', string='Company', default=lambda self: self.env.user.company_id.id)
+    report_by = fields.Selection(
+        [('Summary', 'Summary'), ('Detail', 'Detail')], string='Report Type', default='Detail')
     user_id = fields.Many2one('res.users', string='Salesperson')
 
     @api.constrains('date_from', 'date_to')
@@ -22,23 +26,24 @@ class SalesbyItemDetail(models.TransientModel):
             'ids': self.ids,
             'model': self._name,
             'form': {
-            'product_id': [self.product_id.id, self.product_id.name],
-            'user_id': [self.user_id.id, self.user_id.name],
-            'date_from': self.date_from,
-            'date_to': self.date_to,
-            'company_id': [self.company_id.id, self.company_id.name],
-            'report_by': self.report_by,
+                'product_id': [self.product_id.id, self.product_id.name],
+                'user_id': [self.user_id.id, self.user_id.name],
+                'date_from': self.date_from,
+                'date_to': self.date_to,
+                'company_id': [self.company_id.id, self.company_id.name],
+                'report_by': self.report_by,
             },
         }
 
         return self.env.ref('mgs_sale.action_sales_by_item').report_action(self, data=data)
+
 
 class SalesbyItemDetailReport(models.AbstractModel):
     _name = 'report.mgs_sale.sales_by_item_report'
     _description = 'Sales by Item Report'
 
     @api.model
-    def _lines(self, date_from, date_to, company_id, product_id, user_id, is_group): #, company_branch_ids
+    def _lines(self, date_from, date_to, company_id, product_id, user_id, is_group):  # , company_branch_ids
         full_move = []
         params = []
 
@@ -67,8 +72,8 @@ class SalesbyItemDetailReport(models.AbstractModel):
         if is_group == 'no':
             select = """
             select sr.date, sr.name as order_no, rp.name as partner,
-            sr.product_uom_qty, sr.qty_delivered, sr.qty_invoiced, sr.qty_to_invoice,
-            sr.price_total, sr.state, sr.price_total-sr.margin as cost, sr.margin
+            COALESCE(sr.product_uom_qty, 0), COALESCE(sr.qty_delivered, 0), COALESCE(sr.qty_invoiced, 0), COALESCE(sr.qty_to_invoice, 0), COALESCE(sr.price_total, 0),
+            sr.state, COALESCE(sr.price_total-sr.margin, 0) as cost, COALESCE(sr.margin, 0)
             """
 
             order = """
