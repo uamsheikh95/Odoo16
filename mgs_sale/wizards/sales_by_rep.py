@@ -53,8 +53,8 @@ class SalesbyRepDetailReport(models.AbstractModel):
 
         query = """
         select sr.date, sr.name as order_no, rp.name as partner, pt.name as product_name,
-        COALESCE(sr.product_uom_qty, 0), COALESCE(sr.qty_delivered, 0), COALESCE(sr.qty_invoiced, 0), COALESCE(sr.qty_to_invoice, 0), COALESCE(sr.price_total, 0),
-            sr.state, COALESCE(sr.price_total-sr.margin, 0) as cost, COALESCE(sr.margin, 0)
+        COALESCE(sr.product_uom_qty, 0) as product_uom_qty, COALESCE(sr.qty_delivered, 0) as qty_delivered, COALESCE(sr.qty_invoiced, 0) as qty_invoiced, COALESCE(sr.qty_to_invoice, 0) as qty_to_invoice, COALESCE(sr.price_total, 0) as price_total,
+            sr.state, COALESCE(sr.price_total-sr.margin, 0) as cost, COALESCE(sr.margin, 0) as margin
         from sale_report as sr
         left join res_partner as rp on sr.partner_id=rp.id
         left join product_product as pp on sr.product_id=pp.id

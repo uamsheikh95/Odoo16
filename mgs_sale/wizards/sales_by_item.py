@@ -72,8 +72,8 @@ class SalesbyItemDetailReport(models.AbstractModel):
         if is_group == 'no':
             select = """
             select sr.date, sr.name as order_no, rp.name as partner,
-            COALESCE(sum(sr.product_uom_qty), 0), COALESCE(sum(sr.qty_delivered), 0), COALESCE(sum(sr.qty_invoiced), 0), COALESCE(sum(sr.qty_to_invoice), 0), COALESCE(sum(sr.price_total), 0),
-            sr.state, COALESCE(sum(sr.price_total-sr.margin), 0) as cost, COALESCE(sum(sr.margin), 0)
+            COALESCE(sr.product_uom_qty, 0) as product_uom_qty, COALESCE(sr.qty_delivered, 0) as qty_delivered, COALESCE(sr.qty_invoiced, 0) as qty_invoiced, COALESCE(sr.qty_to_invoice, 0) as qty_to_invoice, COALESCE(sr.price_total, 0) as price_total,
+            sr.state, COALESCE(sr.price_total-sr.margin, 0) as cost, COALESCE(sr.margin, 0) as margin
             """
 
             order = """
