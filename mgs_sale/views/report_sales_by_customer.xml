@@ -88,7 +88,7 @@
                                                 <td><span t-esc="line['order_no']"/></td>
                                                 <td  nowrap="nowrap"><span t-esc="line['salesperson']"/></td>
                                                 <td  nowrap="nowrap"><span t-esc="line['product']['en_US']"/></td>
-                                                <td class="text-right"><span t-esc="line['product_uom_qty']"/></td>
+                                                <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['product_uom_qty'])"/></td>
                                                 <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['qty_delivered'])"/></td>
                                                 <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['qty_invoiced'])"/></td>
                                                 <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['qty_to_invoice'])"/></td>
