@@ -22,7 +22,7 @@
                                 }
 
                                 .table-sm > tbody > tr > td {
-                                    border-top: 1px solid #7d7d7d !important;
+                                    border-top: 1.2px solid #7d7d7d !important;
                                 }
                             </style>
 
