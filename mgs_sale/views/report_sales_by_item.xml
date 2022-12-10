@@ -18,13 +18,17 @@
                     <t t-call="web.internal_layout" t-lang="en_US">
                         <div class="page">
                             <style>
-                                .table-sm > thead > tr > th {
+                                <!-- .table-sm > thead > tr > th {
                                     border-top: 2px solid #212529 !important;
                                     border-bottom: 2px solid #212529 !important;
                                 }
 
                                 .table-sm > tbody > tr > td {
                                     border-top: 1.2px solid #7d7d7d !important;
+                                } -->
+                                th,td {
+                                    border-top: 1.5px solid #212529 !important;
+                                    border-bottom: 1.5px solid #212529 !important;
                                 }
                             </style>
 

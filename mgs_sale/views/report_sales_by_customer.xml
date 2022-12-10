@@ -22,7 +22,8 @@
                                 } -->
 
                                 th,td {
-                                    border-top: 1.5px solid #7d7d7d !important;
+                                    border-top: 1.5px solid #212529 !important;
+                                    border-bottom: 1.5px solid #212529 !important;
                                 }
                             </style>
 
