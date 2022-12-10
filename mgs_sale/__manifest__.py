@@ -8,6 +8,7 @@
     'category': 'Reporting',
     'version': '13.01',
     'depends': ['sale', 'sale_margin'],
+    'license': 'LGPL-3',
     'data': [
         'security/ir.model.access.csv',
         'views/paperformat.xml',

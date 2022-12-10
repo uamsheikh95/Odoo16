@@ -17,7 +17,7 @@
 					<t t-call="web.internal_layout" t-lang="en_US">
 						<div class="page">
 
-							<h1 style="font-size: 2.3rem;margin-bottom:0" class="text-center">Inventory Valuation Summary</h1>
+							<h1 class="text-center">Inventory Valuation Summary</h1>
 							<h3 style="font-size: 1.1rem;font-weight: 700;" class="text-center" t-if="date">As of <span style="font-weight: 500; font-family: monospace;" t-esc="date"/></h3>
 							<div id="informations" class="row mt2 mb2" style="width: 90%; margin: auto">
 								<div class="col-auto mw-100 mb-2" t-if="product_id[1]" name="date" style="width: 20%; float: left;">
