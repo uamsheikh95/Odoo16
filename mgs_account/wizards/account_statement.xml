@@ -16,7 +16,7 @@
 
                <group>
                  <field name="date_to" string="To Date" required="1" />
-                 <field name="analytic_distribution" string = "Analytic Account" widget="analytic_distribution" groups="analytic.group_analytic_accounting"/>
+                 <field name="analytic_account_id" string = "Analytic Account" options="{'no_create': True}" />
                  <field name="report_by" widget="radio" />
                </group>
              </group>
