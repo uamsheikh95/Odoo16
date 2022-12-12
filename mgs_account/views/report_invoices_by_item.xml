@@ -16,13 +16,9 @@
                     <t t-call="web.internal_layout" t-lang="en_US">
                         <div class="page">
                             <style>
-                                .table-sm > thead > tr > th {
-                                border-top: 2px solid #212529 !important;
-                                border-bottom: 2px solid #212529 !important;
-                                }
-
-                                .table-sm > tbody > tr > td {
-                                border-top: 1px solid #7d7d7d;
+                                th,td {
+                                    border-top: 1.5px solid #212529 !important;
+                                    border-bottom: 1.5px solid #212529 !important;
                                 }
                             </style>
 
@@ -104,9 +100,9 @@
 
                                                 <tr style="font-weight: bold">
                                                     <td colspan="4">
-                                                        <span t-esc="product['product_name']" t-if="report_by == 'Summary'"/>
+                                                        <span t-esc="product['product_name']['en_US']" t-if="report_by == 'Summary'"/>
                                                         <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;">TOTAL </span>
-                                                        <span t-esc="product['product_name']" t-if="report_by == 'Detail'" style="color: red; font-weight: bold;"/>
+                                                        <span t-esc="product['product_name']['en_US']" t-if="report_by == 'Detail'" style="color: red; font-weight: bold;"/>
                                                     </td>
                                                     <td class="text-right">
                                                         <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(product['total_qty'])"/>
