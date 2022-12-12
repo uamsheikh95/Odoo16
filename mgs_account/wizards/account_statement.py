@@ -66,8 +66,7 @@ class AccountStatementReport(models.AbstractModel):
             select_query = """
             select aml.id, aml.date as date, aml.move_id as move_id, aj.name as voucher_type,
             rp.name as partner_name, aml.name as label, aml.ref as ref, am.name as voucher_no,
-            aml.partner_id, aml.account_id, aml.debit as debit, aml.credit as credit,
-            aaa.name as analytic_account_name, am.ref as move_ref
+            aml.partner_id, aml.account_id, aml.debit as debit, aml.credit as credit, am.ref as move_ref
             """
 
             order_query = """
@@ -80,7 +79,6 @@ class AccountStatementReport(models.AbstractModel):
         left join res_partner as rp on aml.partner_id=rp.id
         left join account_move as am on aml.move_id=am.id
         left join account_journal as aj on aml.journal_id=aj.id
-        left join account_analytic_account as aaa on cast(jsonb_object_keys(aml.analytic_distribution) as Integer)=aaa.id
         where am.state in """ + states
 
         if date_from:
