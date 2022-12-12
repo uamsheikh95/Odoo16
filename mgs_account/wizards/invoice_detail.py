@@ -69,7 +69,7 @@ class MGSInvoiceDetailReport(models.AbstractModel):
         left join res_partner as rp on air.partner_id=rp.id
         left join product_product as pp on air.product_id=pp.id
         left join product_template as pt on pp.product_tmpl_id=pt.id
-        where air.state = 'posted' and air.quantity != 0
+        where am.state = 'posted' and air.quantity != 0
         and air.move_type in """ + types
 
         if date_from:
