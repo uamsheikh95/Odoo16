@@ -77,7 +77,7 @@
                                         <t t-foreach="lines(date_from, date_to, company_id.id, product_id[0], 'all', invoices_bills)" t-as="main">
                                             <t t-foreach="lines(date_from, date_to, company_id.id, product_id[0], 'yes', invoices_bills)" t-as="product">
                                                 <tr t-if="report_by == 'Detail'" style="color: red; font-weight: bold;">
-                                                    <td colspan="7"><span t-esc="product['product_name']['en_US]"/></td>
+                                                    <td colspan="7"><span t-esc="product['product_name']"/></td>
                                                 </tr>
 
 
