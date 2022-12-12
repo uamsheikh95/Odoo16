@@ -62,14 +62,14 @@ class MGSInvoiceDetailReport(models.AbstractModel):
             types = """('in_invoice', 'in_refund')"""
 
         query = """
-        select air.invoice_date as date, concat(am.invoice_origin,' - ', am.name) as ref, concat(pt.name['en_US],' - ', pt.default_code) as product,
+        select air.invoice_date as date, concat(am.invoice_origin,' - ', am.name) as ref, concat(pt.name['en_US'],' - ', pt.default_code) as product,
         air.quantity as quantity, air.price_subtotal as amount_total, air.price_average as rate, air.state as state, rp.name as partner
         from account_invoice_report as air
         left join account_move as am on air.move_id=am.id
         left join res_partner as rp on air.partner_id=rp.id
         left join product_product as pp on air.product_id=pp.id
         left join product_template as pt on pp.product_tmpl_id=pt.id
-        where am.state = 'posted' and air.quantity != 0
+        where air.state = 'posted' and air.quantity != 0
         and air.move_type in """ + types
 
         if date_from:
