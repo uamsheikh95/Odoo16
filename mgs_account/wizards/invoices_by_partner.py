@@ -65,7 +65,7 @@ class InvoicesbyPartnerReport(models.AbstractModel):
 
         if is_group == 'no':
             select = """
-            select air.invoice_date as date, concat(am.invoice_origin,' - ', am.name) as ref, concat(pt.name['en_US],' - ', pt.default_code) as product,
+            select air.invoice_date as date, concat(am.invoice_origin,' - ', am.name) as ref, pt.name as product,
             air.quantity as quantity, air.price_subtotal as amount_total, air.price_average as rate, air.state as state
             """
 

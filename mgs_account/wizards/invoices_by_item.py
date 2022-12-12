@@ -57,10 +57,10 @@ class InvoicesbyItemReport(models.AbstractModel):
             order = ""
 
         if is_group == 'yes':
-            select = """select pt.name['en_US] as product_name, pp.id as product_id, COALESCE(sum(air.quantity), 0) as total_qty, COALESCE(sum(air.price_subtotal), 0) as total_amount"""
+            select = """select pt.name as product_name, pp.id as product_id, COALESCE(sum(air.quantity), 0) as total_qty, COALESCE(sum(air.price_subtotal), 0) as total_amount"""
             order = """
-            group by pt.name['en_US], pp.id
-            order by pt.name['en_US]
+            group by pt.name, pp.id
+            order by pt.name
             """
 
         if is_group == 'no':
