@@ -50,7 +50,7 @@ class ReceiptAndPaymentReport(models.AbstractModel):
 
         p_type = 'asset_receivable' if payment_type == 'Receipt' else 'liability_payable'
 
-        params = []
+        params = [p_type]
 
         query = """
         select am.name as receipt_no, rp.id as partner_id, rp.name as partner_name, aml.name as ref,
@@ -60,7 +60,7 @@ class ReceiptAndPaymentReport(models.AbstractModel):
         left join account_journal as aj on aml.journal_id=aj.id
         left join account_move as am on aml.move_id=am.id
         left join account_account as aa on aml.account_id=aa.id
-        where aa.account_type = """ + p_type + """
+        where aa.account_type = %s
         and aml.credit > 0 and aj.type in ('bank', 'cash')"""
 
         if date_from:
