@@ -48,7 +48,7 @@ class ReceiptAndPaymentReport(models.AbstractModel):
     def _lines(self, date_from, date_to, company_id, partner_id, journal_id, user_id, payment_type):
         p_type = 'outbound' if payment_type == 'Receipt' else 'inbound'
 
-        p_type = """('Receivable')""" if payment_type == 'Receipt' else """('Payable')"""
+        p_type = 'asset_receivable' if payment_type == 'Receipt' else 'liability_payable'
 
         params = []
 
@@ -60,8 +60,7 @@ class ReceiptAndPaymentReport(models.AbstractModel):
         left join account_journal as aj on aml.journal_id=aj.id
         left join account_move as am on aml.move_id=am.id
         left join account_account as aa on aml.account_id=aa.id
-        left join account_account_type as aat on aa.user_type_id=aat.id
-        where aat.name = """ + p_type + """
+        where aa.account_type = """ + p_type + """
         and aml.credit > 0 and aj.type in ('bank', 'cash')"""
 
         if date_from:
