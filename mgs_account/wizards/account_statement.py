@@ -93,10 +93,11 @@ class AccountStatementReport(models.AbstractModel):
             from_where_query += """ and aml.account_id = """ + str(account_id)
 
         if analytic_account_id:
+            pass
             # from_where_query += """ and aaa.id = """ + \
             #     str(analytic_account_id)
-            from_where_query += ' and aml.analytic_distribution @> \'{"%s": 100}\'::jsonb' % str(
-                analytic_account_id)
+            # from_where_query += ' and aml.analytic_distribution @> \'{"%s": 100}\'::jsonb' % str(
+            #     analytic_account_id)
 
         if partner_id:
             from_where_query += """ and aml.partner_id = """ + str(partner_id)
