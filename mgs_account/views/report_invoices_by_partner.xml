@@ -85,7 +85,7 @@
                                                     <td />
                                                     <td nowrap="nowrap"><span t-esc="line['date']"/></td>
                                                     <td><span t-esc="line['ref']"/></td>
-                                                    <td  nowrap="nowrap"><span t-esc="line['product']"/></td>
+                                                    <td  nowrap="nowrap"><span t-esc="line['product']['en_US']"/></td>
                                                     <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['quantity'])"/></td>
                                                     <td class="text-right">
                                                         <t t-set="rate" t-value="0"/>
