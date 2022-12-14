@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <record id="gross_profit_form" model="ir.ui.view">
+			<field name="name">mgs_account.gross_profit.form</field>
+			<field name="model">mgs_account.gross_profit</field>
+			<field name="arch" type="xml">
+			   <form>
+             <group>
+               <group>
+                 <field name="date_from" string = "From Date"/>
+                 <field name="report_by"/>
+                 
+                 <field name="target_moves" widget="radio"/>
+               </group>
+
+               <group>
+                 <field name="date_to" string="To Date"/>
+                 <field name="partner_id" options="{'no_create': True}" attrs="{'invisible': [('report_by', '!=', 'Partner')]}"/>
+                 <field name="product_id" options="{'no_create': True}" attrs="{'invisible': [('report_by', '!=', 'Product')]}"/>
+
+                 <field name="company_id" groups="base.group_multi_company"/>
+                 <field name="product_type" widget="radio"/>
+               </group>
+             </group>
+
+
+             <footer>
+               <button name="check_report" string="View" type="object" class="oe_highlight"/>
+               <button string="Cancel" special="cancel"/>
+             </footer>
+			   </form>
+			</field>
+		</record>
+
+    <record id="action_gross_profit_form" model="ir.actions.act_window">
+			<field name="name">MGS Gross Profit Report</field>
+			<field name="res_model">mgs_account.gross_profit</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="gross_profit_form"/>
+			<field name="target">new</field>
+		</record>
+
+		<menuitem id="menu_gross_profit_mgs" name="Gross Profit" parent="menu_mgs_account_report" action="action_gross_profit_form"/>
+</odoo>

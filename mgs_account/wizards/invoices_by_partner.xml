@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+		<record id="invoices_by_partner_form" model="ir.ui.view">
+			<field name="name">mgs_account.invoices_by_partner.form</field>
+			<field name="model">mgs_account.invoices_by_partner</field>
+			<field name="arch" type="xml">
+			   <form>
+					<sheet>
+						<group>
+							<group>
+								<field name="date_from" string = "From"/>
+								<field name="partner_id" options="{'no_create': True}" />
+                                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" />
+							</group>
+
+
+							<group>
+								<field name="date_to" string="To"/>
+								<field name="invoices_bills" required="1"/>
+								<field name="report_by" widget="radio"/>
+							</group>
+						</group>
+					</sheet>
+
+				<footer>
+					<button name="confirm" string="View" type="object" class="oe_highlight"/>
+					<button string="Cancel" special="cancel"/>
+				</footer>
+
+			   </form>
+			</field>
+		</record>
+
+
+
+		<record id="action_invoices_by_partner_report" model="ir.actions.act_window">
+			<field name="name">MGS Invoices by Partner Report</field>
+			<field name="res_model">mgs_account.invoices_by_partner</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_id" ref="invoices_by_partner_form"/>
+			<field name="target">new</field>
+		</record>
+
+
+	<menuitem id="menu_mgs_account_report" name="MGS-Accounting Reports" parent="account.menu_finance_reports"  />
+    <menuitem id="menu_invoices_by_partner_report" name="Invoices by Partner" parent="menu_mgs_account_report" action="action_invoices_by_partner_report" sequence="2" />
+
+</odoo>

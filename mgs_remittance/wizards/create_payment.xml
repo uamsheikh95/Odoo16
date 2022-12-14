@@ -1,0 +1,32 @@
+<odoo>
+     <record id="view_mgs_payment_wizard_form" model="ir.ui.view">
+            <field name="name">mgs_remittance.payment.wizard.wiz</field>
+            <field name="model">mgs_remittance.payment.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Create Remittance Payment">
+                    <group>
+                        <group>
+                            <field name="journal_id" options="{'no_create': True}"/>
+                            <field name="memo"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                            <field name="total"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="create_payment"  type="object"  string="Proceed" default_focus="1" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+    </record>
+
+    <act_window id="action_mgs_payment_wizard1"
+        name="Create Payment"
+        res_model="mgs_remittance.payment.wizard"
+        binding_model="mgs_remittance.freight_booking"
+        view_id="mgs_remittance.view_mgs_payment_wizard_form"
+        view_mode="form" target="new" 
+		/>
+</odoo>

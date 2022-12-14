@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<report
+		 id="action_report_product_moves"
+		 name="mgs_inventory.pr_moves_history_report"
+		 model="mgs_inventory.pr_moves_history_report"
+		 string="Product Moves History"
+		 report_type="qweb-html"
+		 paperformat="mgs_inventory_paperformat"
+		 />
+
+		<template id="pr_moves_history_report">
+				<t t-call="web.html_container">
+					<t t-foreach="docs" t-as="doc">
+						 <t t-call="web.internal_layout" t-lang="en_US">
+								<div class="page">
+										<div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+											<div class="text-center" style="margin-top:4px;font-size: 18px; font-weight: bold;">Product Moves History</div>
+
+											<div id="informations" class="row mt2 mb2">
+
+												<div class="col-auto mw-100 mb-2" t-if="date_from" name="invoice_date" style="width: 20%; float: left;">
+													<strong>Date from:</strong>
+													<p class="m-0" t-esc="date_from"/>
+												</div>
+												<div class="col-auto mw-100 mb-2" t-if="date_to" name="due_date" style="width: 20%; float: left;">
+													<strong>Date to:</strong>
+													<p class="m-0" t-esc="date_to"/>
+												</div>
+
+
+												<div class="col-auto mw-100 mb-2" t-if="date_to" name="due_date" style="width: 20%; float: left;" groups="base.group_multi_company">
+													<strong>Company:</strong>
+													<p class="m-0" t-esc="company_name"/>
+												</div>
+
+												<div class="col-auto mw-100 mb-2" name="due_date" style="width: 20%; float: left;" groups="odoo_multi_branch.group_multi_branches">
+													<strong>Branch:</strong>
+													<p class="m-0" t-esc="order_id"/>
+												</div>
+											</div>
+
+											<div class="row">
+												<table style="width:100%;">
+													<thead style="border-bottom:1px solid #dddddd;border-top:1px solid #dddddd">
+														<tr style="background-color: #F2F4F4;">
+															<th nowrap="nowrap">Date</th>
+															<th nowrap="nowrap">From > To</th>
+															<th nowrap="nowrap">Source</th>
+															<th nowrap="nowrap">Partner</th>
+															<th style="text-align:right" nowrap="nowrap">Qty in</th>
+															<th style="text-align:right" nowrap="nowrap">Qty out</th>
+															<th style="text-align:right" nowrap="nowrap" t-if="include_reserved">Reserved</th>
+															<th groups="account.group_account_manager" style="text-align:right" nowrap="nowrap">U.Cost</th>
+															<th style="text-align:right" nowrap="nowrap">Balance</th>
+														</tr>
+													</thead>
+
+													<tbody>
+														<t t-set="total_balance_all" t-value="0"/>
+														<t t-set="total_reserved_all" t-value="0" />
+														<t t-foreach="lines(product_id, date_from, date_to,stock_location_ids,partner_id,include_reserved,show_reserved_only,order_id, 'all')" t-as="main">
+
+															<t t-foreach="lines(product_id, date_from, date_to,stock_location_ids,partner_id,include_reserved,show_reserved_only,order_id, 'yes')" t-as="product">
+																<t t-set="total_balance" t-value="0"/>
+																<t t-set="total_reserved" t-value="0" />
+																<t t-set="balance" t-value="open_balance(product['product_id'], date_from,stock_location_ids,partner_id)"/>
+
+																<tr style="border-bottom:1px solid #dddddd;border-top:1px solid #dddddd">
+															        <td colspan="8"><p style="font-weight:bold;margin-bottom:0;font-size: 16px;color:blue"><span t-esc="product['group']"/></p></td>
+															        <td groups="account.group_account_manager"/>
+															    </tr> <!--Product Name-->
+
+																<tr style="border-bottom:1px solid #dddddd;border-top:1px solid #dddddd">
+															        <td colspan="2"></td>
+															        <td colspan="2" style="font-size=font-size: 13px;color:red">Qty Balance Forward</td>
+															        <td t-if="include_reserved"></td>
+																	<td groups="account.group_account_manager"/>
+															        <td colspan="3" style="text-align:right;font-weight:bold;color:red"><span t-esc="'{0:,.2f}'.format(balance)"/></td>
+															    </tr>
+
+																<tr style="border-bottom:1px solid #dddddd;border-top:1px solid #dddddd" t-foreach="lines(product['product_id'], date_from, date_to,stock_location_ids,partner_id,include_reserved,show_reserved_only,order_id, 'no')" t-as="line">
+																	<td nowrap="nowrap"><span t-esc="line['date']"/></td>
+																	<!-- <td style="display:none"><span t-esc="line['usage']"/> > <span t-esc="line['usaged']"/></td> -->
+																	<td><span t-esc="line['location_id']"/> > <span t-esc="line['location_dest_id']"/></td>
+																	<td><span t-esc="line['picking_id']"/><t t-if="line['origin']"> | <span t-esc="line['origin']"/></t></td>
+																	<td><span t-esc="line['partner_id']" t-if="line['origin']"/></td>
+																	<td style="text-align:right">
+																		<t t-set="qty_in" t-value="line['qty_done']" t-if="line['location_id_id'] not in stock_location_ids" />
+																		<t t-set="qty_in" t-value="0" t-if="line['location_id_id'] in stock_location_ids" />
+																		<span t-esc="'{0:,.2f}'.format(qty_in)"/>
+																	</td>
+
+																	<td style="text-align:right">
+																		<t t-set="qty_out" t-value="line['qty_done']" t-if="line['location_id_id'] in stock_location_ids" />
+																		<t t-set="qty_out" t-value="0" t-if="line['location_id_id'] not in stock_location_ids" />
+																		<span t-esc="'{0:,.2f}'.format(qty_out)"/>
+																	</td>
+
+																	<td style="text-align:right;" t-if="include_reserved">
+																		<t t-set="total_reserved" t-value="total_reserved + line['reserved_qty']" />
+																		<span style="color: red" t-esc="'{0:,.2f}'.format(line['reserved_qty'])"/>
+																	</td>
+
+																	<t t-set="avg_cost" t-value="get_item_avg_cost(line['picking_id'], line['product_id'])"/>
+																	<td groups="account.group_account_manager" style="text-align:right"><span t-esc="'{0:,.2f}'.format(avg_cost)" /></td>
+
+																	<td style="text-align:right">
+																		<t t-set="balance" t-value="balance + qty_in"/>
+																		<t t-set="balance" t-value="balance - qty_out"/>
+																		<span t-esc="'{0:,.2f}'.format(balance)" />
+																	</td>
+
+																</tr>
+
+																<tr style="border-bottom:1px solid #dddddd;border-top:1px solid #dddddd;">
+														            <td colspan="4"><p style="font-weight:bold;margin-bottom:0;font-size: 16px;color:blue">TOTAL <span t-esc="product['group']"/></p></td>
+														            <td style="text-align:right;font-weight:bold"><span t-esc="'{0:,.2f}'.format(product['total_product_in'])" /></td>
+														            <td style="text-align:right;font-weight:bold;padding-left: 10px;"><span t-esc="'{0:,.2f}'.format(product['total_product_out'])" /></td>
+														            <td style="text-align:right;font-weight:bold" t-if='include_reserved'><span t-esc="'{0:,.2f}'.format(total_reserved)"/></td>
+																	<t t-set="total_reserved_all" t-value="total_reserved_all + total_reserved"/>
+																	<td groups="account.group_account_manager"/>
+																	<td style="text-align:right;font-weight:bold">
+														                <span t-esc="'{0:,.2f}'.format(balance)" />
+														                <t t-set="total_balance_all" t-value="total_balance_all + balance"/>
+														            </td>
+														        </tr>
+
+														        <tr style="border-bottom:1px solid #dddddd;border-top:1px">
+														            <td colspan="8" style="height: 20px"/>
+														            <td groups="account.group_account_manager"/>
+														        </tr>
+															</t>
+
+															<tr style="border-bottom:1px solid #dddddd;border-top:1px solid #dddddd;background-color: #F2F4F4;font-size: 14px;">
+														        <td colspan="4"><p style="font-weight:bold;margin-bottom:0;">Total </p></td>
+														        <td style="text-align:right;font-weight:bold"><span t-esc="'{0:,.2f}'.format(main['total_product_in_all'])" /></td>
+														        <td style="text-align:right;font-weight:bold;padding-left: 10px;"><span t-esc="'{0:,.2f}'.format(main['total_product_out_all'])" /></td>
+														        <td t-if="include_reserved"><span t-esc="'{0:,.2f}'.format(total_reserved_all)" /></td>
+																<td groups="account.group_account_manager"/>
+														        <td style="text-align:right;font-weight:bold"><span t-esc="'{0:,.2f}'.format(total_balance_all)" /></td>
+														    </tr>
+														</t>
+													</tbody>
+												</table>
+											</div> <!--tow-->
+
+
+										</div> <!--container-->
+								</div> <!--page-->
+							</t> <!--web.external_layout-->
+						</t>
+				</t> <!--web.html_container-->
+		</template>
+</odoo>

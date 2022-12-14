@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+        id="action_purchases_by_vendor"
+        name="mgs_purchase.purchases_by_vendor_report"
+        model="mgs_purchase.purchases_by_vendor_report"
+        string="Purchases by Vendor"
+        report_type="qweb-html"
+        paperformat="mgs_purchase_paperformat"
+        />
+
+        <template id="purchases_by_vendor_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.internal_layout" t-lang="en_US">
+                        <div class="page">
+                            <style>
+                                th,td {
+                                    border-top: 1.5px solid #212529 !important;
+                                    border-bottom: 1.5px solid #212529 !important;
+                                }
+                            </style>
+
+                            <div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+                                <h2>Purchases by Vendor <span t-esc="report_by"/></h2>
+
+                                <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+
+                                    <div class="col-3" t-if="date_from or date_to">
+                                        <strong>Date:</strong>
+                                        <p t-esc="date_from" style="margin-bottom: 0"/>
+                                        <p t-esc="date_to"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="partner_id[0]">
+                                        <strong>Vendor:</strong>
+                                        <p class="m-0" t-esc="partner_id[1]"/>
+                                    </div>
+
+                                    <div class="col-4" t-if="company_id" groups="base.group_multi_company">
+                                        <strong>Company:</strong>
+                                        <p t-esc="company_id.name"/>
+                                    </div>
+
+
+                                </div>
+
+                                <table class="table table-condensed table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th nowrap="nowrap">Vendor</th>
+                                            <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Date</t></th>
+                                            <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Order</t></th>
+                                            <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Item</t></th>
+                                            <th class="text-center" nowrap="nowrap">Ordered Qty</th>
+                                            <th class="text-center" nowrap="nowrap">Received Qty</th>
+                                            <th class="text-center" nowrap="nowrap">Billed Qty</th>
+                                            <th class="text-center" nowrap="nowrap">Qty to be Billed</th>
+                                            <th class="text-right" nowrap="nowrap"><t t-if="report_by == 'Detail'">Rate</t></th>
+                                            <th class="text-right" nowrap="nowrap">Amount</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <t t-foreach="lines(date_from, date_to, company_id.id, partner_id[0], 'all')" t-as="main">
+                                            <!-- ++++++++++++++++ Vendors ++++++++++++++++ -->
+                                            <t t-foreach="lines(date_from, date_to, company_id.id, partner_id[0], 'yes')" t-as="partner">
+                                                <tr t-if="report_by == 'Detail'" style="color: red; font-weight: bold;">
+                                                    <td colspan="10"><span t-esc="partner['partner_name']"/></td>
+                                                </tr>
+
+
+                                                <t t-foreach="lines(date_from, date_to, company_id.id, partner['partner_id'], 'no')" t-as="line">
+                                                    <tr t-if="report_by == 'Detail'">
+                                                        <td />
+                                                        <td nowrap="nowrap"><span t-esc="line['date_order']"/></td>
+                                                        <td><span t-esc="line['order_no']"/></td>
+                                                        <td  nowrap="nowrap"><span t-esc="line['product']['en_US']"/></td>
+                                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['qty_ordered'])"/></td>
+                                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['qty_received'])"/></td>
+                                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['qty_billed'])"/></td>
+                                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['qty_to_be_billed'])"/></td>
+                                                        <td class="text-right">
+                                                            <t t-set="rate" t-value="0"/>
+                                                            <t t-set="rate" t-value="line['price_total']/line['qty_ordered']" t-if="line['qty_ordered'] and line['price_total']"/>
+                                                            <span t-esc="'{0:,.2f}'.format(rate)"/>
+                                                        </td>
+                                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['price_total'])" t-if="line['price_total']"/></td>
+                                                    </tr>
+                                                </t>
+
+                                                <tr style="font-weight: bold">
+                                                    <td colspan="4">
+                                                        <span t-esc="partner['partner_name']" t-if="report_by == 'Summary'"/>
+                                                        <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;">TOTAL </span>
+                                                        <span t-esc="partner['partner_name']" t-if="report_by == 'Detail'" style="color: red; font-weight: bold;"/>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(partner['total_qty_ordered'])"/>
+                                                        <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(partner['total_qty_ordered'])"/>
+                                                    </td>
+
+                                                    <td class="text-right">
+                                                        <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(partner['total_qty_received'])"/>
+                                                        <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(partner['total_qty_received'])"/>
+                                                    </td>
+
+                                                    <td class="text-right">
+                                                        <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(partner['total_qty_billed'])"/>
+                                                        <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(partner['total_qty_billed'])"/>
+                                                    </td>
+
+                                                    <td class="text-right">
+                                                        <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(partner['total_qty_to_be_billed'])"/>
+                                                        <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(partner['total_qty_to_be_billed'])"/>
+                                                    </td>
+
+                                                    <td class="text-right"></td>
+                                                    <td class="text-right">
+                                                        <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(partner['total_amount'])"/>
+                                                        <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(partner['total_amount'])"/>
+                                                    </td>
+
+                                                </tr>
+                                                <tr t-if="report_by == 'Detail'"><td colspan="10"/></tr>
+                                            </t>
+
+                                            <tr style="font-weight: bold;font-size: 13px">
+                                                <td colspan="4"></td>
+                                                <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(main['total_qty_ordered_all'])"/></td>
+                                                <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(main['total_qty_received_all'])"/></td>
+                                                <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(main['total_qty_billed_all'])"/></td>
+                                                <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(main['total_qty_to_be_billed_all'])"/></td>
+                                                <td class="text-right"></td>
+                                                <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(main['total_amount_all'])"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+
+                            </div> <!--container-->
+                        </div> <!--page-->
+                    </t> <!--web.external_layout-->
+                </t>
+            </t> <!--web.html_container-->
+        </template>
+    </odoo>

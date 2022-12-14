@@ -1,0 +1,28 @@
+<odoo>
+     <record id="remittance_payments_wizard_form" model="ir.ui.view">
+            <field name="name">mgs_remittance.remittance_payments.wiz</field>
+            <field name="model">mgs_remittance.remittance_payments</field>
+            <field name="arch" type="xml">
+                <form string="Remittance Payments Report Form">
+                    <group>
+                        <group>
+                            <field name="rem_id"/>
+                        </group>
+                        <group>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="check_report" string="View" type="object" class="oe_highlight"/>
+                        <button string="Close" class="btn-default" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_remittance_payments_wizard">
+      <field name="name">Mgs Remittance Payments Report</field>
+      <field name="res_model">mgs_remittance.remittance_payments</field>
+      <field name="view_id" ref="remittance_payments_wizard_form"/>
+      <field name="target">new</field>
+    </record>
+</odoo>

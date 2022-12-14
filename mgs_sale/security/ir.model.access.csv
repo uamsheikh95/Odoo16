@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mgs_sale_sales_by_customer,mgs_sale.sales_by_customer,model_mgs_sale_sales_by_customer,,1,1,1,1
+access_mgs_sale_sales_by_item,mgs_sale.sales_by_item,model_mgs_sale_sales_by_item,,1,1,1,1
+access_mgs_sale_sales_by_rep,mgs_sale.sales_by_rep,model_mgs_sale_sales_by_rep,,1,1,1,1

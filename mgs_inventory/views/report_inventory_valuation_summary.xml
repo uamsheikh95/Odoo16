@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<!-- PDF -->
+	<report
+		id="action_valuation_summary"
+		name="mgs_inventory.valuation_summary_report"
+		model="mgs_inventory.valuation_summary_report"
+		string="Inventory Valuation Summary"
+		report_type="qweb-html"
+		paperformat="mgs_inventory_paperformat"
+		/>
+
+		<template id="valuation_summary_report">
+			<t t-call="web.html_container">
+				<t t-foreach="docs" t-as="doc">
+					<t t-call="web.internal_layout" t-lang="en_US">
+						<div class="page">
+
+							<h1 class="text-center">Inventory Valuation Summary</h1>
+							<h3 style="font-size: 1.1rem;font-weight: 700;" class="text-center" t-if="date">As of <span style="font-weight: 500; font-family: monospace;" t-esc="date"/></h3>
+							<div id="informations" class="row mt2 mb2" style="width: 90%; margin: auto">
+								<div class="col-auto mw-100 mb-2" t-if="product_id[1]" name="date" style="width: 20%; float: left;">
+									<strong>Product:</strong>
+									<p class="m-0" t-esc="product_id[1]"/>
+								</div>
+
+								<div class="col-auto mw-100 mb-2" t-if="categ_id[1]" name="categ_name" style="width: 20%; float: left;">
+									<strong>Category:</strong>
+									<p class="m-0" t-esc="categ_id[1]"/>
+								</div>
+							</div>
+
+							<table style="width: 100%;width: 90%; margin: auto">
+								<thead>
+									<tr style="border-top: 1px solid black; boder-bottom: 1px solid black">
+										<th>Category</th>
+										<th>Item Code</th>
+										<th>Item Description</th>
+										<th class="text-right">On Hand</th>
+										<th class="text-right">Avg Cost</th>
+										<th class="text-right">Asset Value</th>
+										<th class="text-right">Sales Price</th>
+										<th class="text-right">Retail Value</th>
+										<th class="text-right">Margin</th>
+									</tr>
+								</thead>
+								<tbody>
+									<t t-set="tot_qty_all" t-value="0"/>
+									<t t-set="tot_asset_value_all" t-value="0"/>
+									<t t-set="tot_retail_value_all" t-value="0"/>
+									<t t-set="tot_margin_all" t-value="0"/>
+
+									<t t-foreach="lines(date, categ_id[0], product_id[0], company_id.id, 'category')" style="border-top: 1px solid; boder-bottom: 1px solid" t-as="category">
+										<tr style="font-size: 15px;border-top: 1px solid black; boder-bottom: 1px solid black">
+											<td colspan="9"><span t-esc="category['categ_name']"/></td>
+										</tr>
+
+										<!-- PRODUCTS -->
+
+										<t t-set="tot_qty" t-value="0"/>
+										<t t-set="tot_asset_value" t-value="0"/>
+										<t t-set="tot_retail_value" t-value="0"/>
+										<t t-set="tot_margin" t-value="0"/>
+										<tr t-foreach="lines(date, category['categ_id'], product_id[0], company_id.id, 'product')" style="border-top: 1px solid; boder-bottom: 1px solid;font-size: 13px" t-as="line">
+											<td/>
+											<td><span t-esc="line['default_code']"/></td>
+										    <td><span t-esc="line['product_name']['en_US']"/></td>
+										    <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['on_hand'])"/></td> <t t-set="tot_qty" t-value="tot_qty+line['on_hand']"/>
+										    <t t-set="avg_cost" t-value="get_avg_cost(line['product_id'])"/>
+										    <td class="text-right"><span t-esc="'{0:,.2f}'.format(avg_cost)"/></td>
+										    <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['product_value'])"/></td> <t t-set="tot_asset_value" t-value="tot_asset_value+line['product_value']"/>
+										    <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['product_price'])"/></td>
+										    <td class="text-right">
+										        <t t-set="retail_value" t-value="line['product_price'] * line['on_hand']"/> <t t-set="tot_retail_value" t-value="tot_retail_value+retail_value"/>
+										        <span t-esc="'{0:,.2f}'.format(retail_value)"/>
+										    </td>
+										    <td class="text-right">
+										        <t t-set="margin" t-value="0"/>
+										        <t t-set="margin" t-value="retail_value-line['product_value']"/>
+										        <t t-set="tot_margin" t-value="tot_margin+margin"/>
+										        <span t-esc="'{0:,.2f}'.format(margin)"/>
+										    </td>
+										</tr>
+
+										<tr style="font-size: 15px;border-top: 1px solid black; boder-bottom: 1px solid black">
+										    <td colspan="3" />
+										    <td class="text-right"><span t-esc="'{0:,.2f}'.format(tot_qty)"/></td> <t t-set="tot_qty_all" t-value="tot_qty_all+tot_qty"/>
+										    <td />
+										    <td class="text-right"><span t-esc="'{0:,.2f}'.format(tot_asset_value)"/></td> <t t-set="tot_asset_value_all" t-value="tot_asset_value_all+tot_asset_value"/>
+										    <td />
+										    <td class="text-right"><span t-esc="'{0:,.2f}'.format(tot_retail_value)"/></td> <t t-set="tot_retail_value_all" t-value="tot_retail_value_all+tot_retail_value"/>
+										    <td class="text-right"><span t-esc="'{0:,.2f}'.format(tot_margin)"/></td> <t t-set="tot_margin_all" t-value="tot_margin_all+tot_margin"/>
+										</tr>
+									</t>
+									<tr style="font-size: 14px;border-top: 1px solid black; boder-bottom: 1px solid black;font-weight: bold">
+										<td colspan="3" />
+										<td class="text-right"><span t-esc="'{0:,.2f}'.format(tot_qty_all)"/></td>
+										<td />
+										<td class="text-right"><span t-esc="'{0:,.2f}'.format(tot_asset_value_all)"/></td>
+										<td />
+										<td class="text-right"><span t-esc="'{0:,.2f}'.format(tot_retail_value_all)"/></td>
+										<td class="text-right"><span t-esc="'{0:,.2f}'.format(tot_margin_all)"/></td>
+									</tr>
+								</tbody>
+							</table>
+						</div> <!--page-->
+					</t> <!--web.external_layout-->
+				</t>
+			</t> <!--web.html_container-->
+		</template>
+	</odoo>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+        id="action_remittance_payments_report"
+        name="mgs_remittance.remittance_payments_report"
+        model="mgs_remittance.remittance_payments_report"
+        string="MGS Remittance Payments Report"
+        report_type="qweb-html"
+        />
+
+        <template id="remittance_payments_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.internal_layout" t-lang="en_US">
+                        <div class="page">
+                            <style>
+                                th, td {
+                                    padding: 0.30rem !important;
+                                    border-top: 1px solid #212529 !important;
+                                    border-bottom: 1px solid #212529 !important;
+                                }
+                            </style>
+
+                            <div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+                                <h1>Payments</h1>
+
+                                <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+                                    <div class="col-3" t-if="rem_id">
+                                        <strong>Rem ID:</strong>
+                                        <p t-esc="rem_id"/>
+                                    </div>
+                                </div>
+
+                            <table class="table table-condensed table-sm">
+                                <thead>
+                                    <tr>
+                                        <th nowrap="nowrap">Payment Date</th>
+                                        <th nowrap="nowrap">Payment#</th>
+                                        <th nowrap="nowrap">Journal</th>
+                                        <th class="text-right">Amount</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <t t-set="total_due" t-value="0"/>
+                                    <t t-set="total_amount" t-value="0"/>
+                                    <tr t-foreach="payment_ids" t-as="line">
+                                        <td nowrap="nowrap"><span t-esc="line.date"/></td>
+                                        <td nowrap="nowrap"><span t-esc="line.move_id.name"/></td>
+                                        <td><span t-esc="line.journal_id.name"/></td>
+                                        <td class="text-right"><span t-esc="line.debit"/></td>
+
+                                        <t t-set="total_amount" t-value="total_amount+line.debit"/>
+                                    </tr>
+
+                                    <tr style="font-weight: bold;font-size: 13px">
+                                        <td colspan="3"></td>
+                                        <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(total_amount)"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div> <!--container-->
+                    </div> <!--page-->
+                </t> <!--web.external_layout-->
+            </t>
+        </t> <!--web.html_container-->
+    </template>
+</odoo>

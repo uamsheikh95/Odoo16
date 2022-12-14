@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+        id="action_receipt_and_payment"
+        name="mgs_account.receipt_and_payment_report"
+        model="mgs_account.receipt_and_payment_report"
+        string="Receipt and Payment"
+        report_type="qweb-html"
+        paperformat="mgs_account_paperformat"
+        />
+
+        <template id="receipt_and_payment_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.internal_layout" t-lang="en_US">
+                        <div class="page">
+                            <style>
+                                th, td {
+                                    padding: 0.30rem !important;
+                                    border-top: 1px solid #212529 !important;
+                                    border-bottom: 1px solid #212529 !important;
+                                }
+                            </style>
+
+                            <div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+                                <h2>Payment and Receipt</h2>
+
+                                <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+
+                                    <div class="col-3" t-if="date_from or date_to">
+                                        <strong>Date:</strong>
+                                        <p t-esc="date_from" style="margin-bottom: 0"/>
+                                        <p t-esc="date_to"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="partner_id[0]">
+                                        <strong>Partner:</strong>
+                                        <p class="m-0" t-esc="partner_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="journal_id[0]">
+                                        <strong>Journal:</strong>
+                                        <p class="m-0" t-esc="journal_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="user_id[0]">
+                                        <strong>User:</strong>
+                                        <p class="m-0" t-esc="user_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="payment_type">
+                                        <strong>Payment Type:</strong>
+                                        <p class="m-0" t-esc="payment_type"/>
+                                    </div>
+
+                                    <div class="col-4" t-if="company_id"  groups="base.group_multi_company">
+                                        <strong>Company:</strong>
+                                        <span style="border: 1px solid black; padding: 1px; border-radius: 4px; background: #eeebeb; margin-right: 2px " t-esc="company_id.name"/>
+                                    </div>
+
+
+                            </div>
+
+                            <table class="table table-condensed table-sm">
+                                <thead>
+                                    <tr>
+                                        <th nowrap="nowrap">Date</th>
+                                        <th>Number</th>
+                                        <th>Partner</th>
+                                        <th t-if="not journal_id[0]">Journal</th>
+                                        <th>Ref</th>
+                                        <th class="text-right">Total</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <t t-set="total_amount" t-value="0"/>
+                                    <tr t-foreach="lines(date_from, date_to, company_id.id, partner_id[0], journal_id[0], user_id[0], payment_type)" t-as="line">
+                                        <td nowrap="nowrap"><span t-esc="line['date']"/></td>
+                                        <td><span t-esc="line['receipt_no']"/></td>
+                                        <td><span t-esc="line['partner_name']"/></td>
+                                        <td t-if="not journal_id[0]"><span t-esc="line['journal_name']"/></td>
+                                        <td><span t-esc="line['ref']"/></td>
+                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['amount_paid'])"/></td>
+
+                                        <!-- <td nowrap="nowrap"><span t-esc="line.date"/></td>
+                                        <td><span t-esc="line.name"/></td>
+                                        <td><span t-esc="line.partner_id.name"/></td>
+                                        <td t-if="not journal_id[0]"><span t-esc="line.journal_id.name"/></td>
+                                        <td><span t-esc="line.ref"/></td>
+                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line.amount)"/></td> -->
+
+                                        <t t-set="total_amount" t-value="total_amount+line['amount_paid']"/>
+                                    </tr>
+
+                                    <tr style="font-weight: bold;font-size: 13px">
+                                        <td colspan="4"></td>
+                                        <td t-if="not journal_id[0]"/>
+                                        <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(total_amount)"/></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div> <!--container-->
+                    </div> <!--page-->
+                </t> <!--web.external_layout-->
+            </t>
+        </t> <!--web.html_container-->
+    </template>
+</odoo>

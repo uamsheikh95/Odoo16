@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+        id="action_report_gross_profit"
+        name="mgs_account.gross_profit_report"
+        model="mgs_account.gross_profit_report"
+        string="Gross Profit"
+        report_type="qweb-html"
+        />
+
+        <template id="gross_profit_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.internal_layout" t-lang="en_US">
+                        <div class="page">
+                            <div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+                                <h2>Gross Profit</h2>
+                                <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+                                    <div class="col-3" t-if="date_from or date_to">
+                                        <strong>Date:</strong>
+                                        <p t-esc="date_from" style="margin-bottom: 0"/>
+                                        <p t-esc="date_to"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="partner_id[0]">
+                                        <strong>Partner:</strong>
+                                        <p class="m-0" t-esc="partner_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="product_id[0]">
+                                        <strong>Product:</strong>
+                                        <p class="m-0" t-esc="product_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="company_id"  groups="base.group_multi_company">
+                                        <strong>Company:</strong>
+                                        <span style="border: 1px solid black; padding: 1px; border-radius: 4px; background: #eeebeb; margin-right: 2px " t-esc="company_id.name"/>
+                                    </div>
+                                </div>
+
+                                <table class="table table-condensed table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th><span t-esc="report_by"/></th>
+                                            <th>Product Code</th>
+                                            <th class="text-right">Actual Revenue</th>
+                                            <th class="text-right">Actual Cost</th>
+                                            <th class="text-right">Gross Profit</th>
+                                            <th class="text-right">Gross Profit %</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <t t-set="no" t-value="0"/>
+                                        <t t-set="total_act_cost" t-value="0"/>
+                                        <t t-set="total_act_revenue" t-value="0"/>
+
+                                        <tr t-foreach="lines(company_id.id, date_from, date_to, partner_id[0], product_id[0], target_moves, product_type, report_by)" t-as="line">
+                                            <t t-set="no" t-value="no+1"/>
+                                            <td><span t-esc="no"/></td>
+                                            <td><span t-esc="line['group']"/></td>
+                                            <td><span t-esc="line['default_code']"/></td>
+                                            <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['act_revenue'])"/></td>
+                                            <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['act_cost'])"/></td>
+                                            <t t-set="balance" t-value="line['act_revenue']-line['act_cost']"/>
+                                            <td class="text-right"><span t-esc="'{0:,.2f}'.format(balance)"/></td>
+
+                                            <t t-set="balance_percentage" t-value="(balance/line['act_revenue']) * 100" t-if="line['act_revenue']"/>
+                                            <td class="text-right"><span t-esc="'{0:,.2f}'.format(balance_percentage)"/></td>
+
+                                            <t t-set="total_act_cost" t-value="total_act_cost + line['act_cost']"/>
+                                            <t t-set="total_act_revenue" t-value="total_act_revenue + line['act_revenue']"/>
+                                        </tr>
+
+                                        <tr style="font-weight: bold">
+                                            <td colspan="3"/>
+                                            <td class="text-right"><span t-esc="'{0:,.2f}'.format(total_act_revenue)"/></td>
+                                            <td class="text-right"><span t-esc="'{0:,.2f}'.format(total_act_cost)"/></td>
+                                            <td class="text-right"><span t-esc="'{0:,.2f}'.format(total_act_revenue-total_act_cost)"/></td>
+                                            <td class="text-right"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div> <!--container-->
+                        </div> <!--page-->
+                    </t> <!--web.external_layout-->
+                </t>
+            </t> <!--web.html_container-->
+        </template>
+</odoo>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+        id="action_invoices_by_item"
+        name="mgs_account.invoices_by_item_report"
+        model="mgs_account.invoices_by_item_report"
+        string="Invoices by Item"
+        report_type="qweb-html"
+        paperformat="mgs_account_paperformat"
+        />
+
+        <template id="invoices_by_item_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.internal_layout" t-lang="en_US">
+                        <div class="page">
+                            <style>
+                                th,td {
+                                    border-top: 1.5px solid #212529 !important;
+                                    border-bottom: 1.5px solid #212529 !important;
+                                }
+                            </style>
+
+                            <div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+                                <h2>
+                                    <span t-esc="invoices_bills"/> by
+                                    Item
+                                    <span t-esc="report_by"/>
+                                </h2>
+
+                                <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+
+                                    <div class="col-3" t-if="date_from or date_to">
+                                        <strong>Date:</strong>
+                                        <p t-esc="date_from" style="margin-bottom: 0"/>
+                                        <p t-esc="date_to"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="product_id[0]">
+                                        <strong>Partner:</strong>
+                                        <p class="m-0" t-esc="product_id[1]"/>
+                                    </div>
+
+                                    <div class="col-4" t-if="company_id"  groups="base.group_multi_company">
+                                        <strong>Company:</strong>
+                                        <span style="border: 1px solid black; padding: 1px; border-radius: 4px; background: #eeebeb; margin-right: 2px " t-esc="company_id.name"/>
+                                    </div>
+
+
+                                </div>
+
+                                <table class="table table-condensed table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th nowrap="nowrap">
+                                                <span t-if="invoices_bills == 'Invoices'">Customer</span>
+                                                <span t-if="invoices_bills == 'Bills'">Vendor</span>
+                                            </th>
+                                            <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Date</t></th>
+                                            <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Order</t></th>
+                                            <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Item</t></th>
+                                            <th class="text-center" nowrap="nowrap">Quantity</th>
+                                            <th class="text-right" nowrap="nowrap"><t t-if="report_by == 'Detail'">Rate</t></th>
+                                            <!-- <th class="text-right" nowrap="nowrap">COGS AMT</th> -->
+                                            <th class="text-right" nowrap="nowrap">Total</th>
+                                            <!-- <th class="text-right" nowrap="nowrap">Total Margin</th> -->
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                        <t t-foreach="lines(date_from, date_to, company_id.id, product_id[0], 'all', invoices_bills)" t-as="main">
+                                            <t t-foreach="lines(date_from, date_to, company_id.id, product_id[0], 'yes', invoices_bills)" t-as="product">
+                                                <tr t-if="report_by == 'Detail'" style="color: red; font-weight: bold;">
+                                                    <td colspan="7"><span t-esc="product['product_name']['en_US']"/></td>
+                                                </tr>
+
+
+                                                <t t-foreach="lines(date_from, date_to, company_id.id, product['product_id'], 'no', invoices_bills)" t-as="line">
+                                                    <tr t-if="report_by == 'Detail'">
+                                                        <td />
+                                                        <td nowrap="nowrap"><span t-esc="line['date']"/></td>
+                                                        <td><span t-esc="line['ref']"/></td>
+                                                        <td  nowrap="nowrap"><span t-esc="line['partner']"/></td>
+                                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['quantity'])"/></td>
+                                                        <td class="text-right">
+                                                            <t t-set="rate" t-value="0"/>
+                                                            <t t-set="rate" t-value="line['amount_total']/line['quantity']" t-if="line['quantity'] and line['amount_total']"/>
+                                                            <span t-esc="'{0:,.2f}'.format(rate)"/>
+                                                        </td>
+                                                        <!-- <td class="text-right">
+                                                            <t t-set="cogs" t-value="get_cogs(line['move_id'], line['product_id'])"/>
+                                                            <span t-esc="'{0:,.2f}'.format(cogs)"/>
+                                                        </td> -->
+                                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['amount_total'])" t-if="line['amount_total']"/></td>
+                                                        <!-- <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['amount_total']-cogs)"/></td> -->
+                                                    </tr>
+                                                </t>
+
+                                                <tr style="font-weight: bold">
+                                                    <td colspan="4">
+                                                        <span t-esc="product['product_name']['en_US']" t-if="report_by == 'Summary'"/>
+                                                        <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;">TOTAL </span>
+                                                        <span t-esc="product['product_name']['en_US']" t-if="report_by == 'Detail'" style="color: red; font-weight: bold;"/>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(product['total_qty'])"/>
+                                                        <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(product['total_qty'])"/>
+                                                    </td>
+
+                                                    <td class="text-right"></td>
+                                                    <td class="text-right">
+                                                        <span t-if="report_by == 'Detail'" style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(product['total_amount'])"/>
+                                                        <span t-if="report_by == 'Summary'" t-esc="'{0:,.2f}'.format(product['total_amount'])"/>
+                                                    </td>
+
+                                                </tr>
+                                                <tr t-if="report_by == 'Detail'"><td colspan="10"/></tr>
+                                            </t>
+
+                                            <tr style="font-weight: bold;font-size: 13px">
+                                                <td colspan="4"></td>
+                                                <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(main['total_qty_all'])"/></td>
+                                                <td class="text-right"></td>
+                                                <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(main['total_amount_all'])"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+
+                            </div> <!--container-->
+                        </div> <!--page-->
+                    </t> <!--web.external_layout-->
+                </t>
+            </t> <!--web.html_container-->
+        </template>
+    </odoo>

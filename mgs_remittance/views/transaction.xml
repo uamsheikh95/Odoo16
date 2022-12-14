@@ -1,0 +1,435 @@
+<odoo>
+  <data>
+    <!-- Transaction Views -->
+    <record model="ir.ui.view" id="mgs_remittance_transaction_list">
+      <field name="name">mgs_remittance.transaction.tree</field>
+      <field name="model">mgs_remittance.transaction</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="company_id"/>
+          <field name="sender_id"/>
+          <field name="s_mobile"/>
+          <field name="s_country_id"/>
+          <field name="total" sum="total"/>
+          <!-- <field name="paid_amount" sum="paid_amount"/> -->
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="mgs_remittance_transaction_form">
+      <field name="name">mgs_remittance.transaction.form</field>
+      <field name="model">mgs_remittance.transaction</field>
+      <field name="arch" type="xml">
+        <form>
+          <header>
+            <!-- <button name="action_submit" string="Submit" type="object" class="oe_highlight" states="draft"/> -->
+            <button name="action_approve" string="S.Approve" type="object" class="oe_highlight" states="draft" /><!-- states="submited" --> 
+            <field name="state" widget="statusbar"  statusbar_visible="draft,submited,approved,received,paid"/>
+          </header>
+
+          <sheet>
+            <div class="oe_button_box" name="button_box">
+              <button name="button_open_journal_entry" type="object" class="oe_stat_button" icon="fa-bars" attrs="{'invisible': [('move_ids', '=', False)]}">
+                  Journal Entry
+                  <field name="move_ids" invisible="1"/>
+              </button>
+            </div>
+            <div class="oe_title" style="float:left;width:50%;margin-top:20px">
+              <h1><field name="name" string="Order#" readonly="1"/></h1>
+            </div>
+
+            <group>
+              <group>
+                <field name="company_id" options="{'no_create': True, 'no_open': True}" readonly="1"/>
+              </group>
+
+              <group>
+                <field name="date"/>
+                <!-- <field name="destination_company_id" options="{'no_create': True}"/> -->
+              </group>
+            </group>
+            <group string="Sender Details">
+              <group>
+                <field name="sender_id" options="{'no_quick_create': True}"/>
+                <field name="s_email"/>
+                <field name="s_country_id" options="{'no_create': True}"/>
+                <field name="s_remarks"/>
+                <field name="remmitence_move_group_by" invisible="1"/>
+              </group>
+
+              <group>
+                <field name="s_mobile"/>
+                <field name="s_id_no"/>
+                <field name="s_city_id" options="{'no_create': True}"/>
+                <field name="s_guarantor"/>
+              </group>
+            </group>
+
+            <!-- <group>
+              <group string="Accounting">
+                <field name="journal_id" options="{'no_create': True}"/>
+                <field name="amount"/>
+                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                <field name="currency_id" groups="base.group_multi_currency" options="{'no_create': True}"/>
+              </group>
+
+              <group string="Commission">
+                <field name="apply_commission"/>
+                <field name="commission_amount" attrs="{'invisible': [('apply_commission', '=', False)]}"/>
+              </group>
+            </group> -->
+
+            <notebook>
+              <page string="Beneficiaries">
+                <field name="transaction_line_ids" 
+                  context="{'default_transaction_id': id, 'default_sender_id': sender_id, 'default_s_mobile': s_mobile, 'default_s_email': s_email, 'default_s_country_id': s_country_id, 'default_s_city_id': s_city_id, 'default_s_remarks': s_remarks, 'default_s_id_no': s_id_no, 'default_s_guarantor': s_guarantor}">
+                  <form>
+                    <group>
+                      <group>
+                        <field name="destination_company_partner_id" attrs="{'required': [('is_against_transaction_line', '=', False)]}" options="{'no_create': True, 'no_open': True}"/>
+                      </group>
+
+                      <group>
+                      </group>
+                    </group>
+                    <group string="Beneficiary Details">
+                      <group>
+                        <field name="beneficiary_id" options="{'no_quick_create': True}"/>
+                        <field name="b_email"/>
+                        <field name="b_country_id" options="{'no_create': True}"/>
+                        <field name="b_remarks"/>
+                      </group>
+
+                      <group>
+                        <field name="b_mobile"/>
+                        <field name="b_id_no"/>
+                        <field name="b_city_id" options="{'no_create': True}"/>
+                        <field name="b_guarantor"/>
+                        <field name="is_against_transaction_line" invisible="1"/>
+                      </group>
+                    </group>
+
+                    <group>
+                      <group string="Accounting">
+                        <field name="journal_id" required="1" options="{'no_create': True}"/>
+                        <field name="amount"/>
+                        <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                        <field name="currency_id" groups="base.group_multi_currency" options="{'no_create': True}"/>
+                      </group>
+
+                      <group string="Commission">
+                        <field name="apply_commission"/>
+                        <field name="commission_amount" attrs="{'invisible': [('apply_commission', '=', False)], 'required': [('apply_commission', '=', True)]}"/>
+                      </group>
+                    </group>
+                    <!-- Fixme -->
+                    <!-- <group string="Approval">
+                      <group>
+                        <field name="create_uid"/>
+                        <field name="create_date"/>
+                      </group>
+                      <group>
+                        <field name="approve_uid"/>
+                        <field name="approve_date"/>
+                      </group>
+                    </group> -->
+
+                    <group class="oe_subtotal_footer oe_right">
+                      <div class="oe_subtotal_footer_separator oe_inline">
+                          <label for="total" string="Total"/>
+                      </div>
+                      <field name="total" nolabel="1" class="oe_subtotal_footer_separator"/>
+                    </group>
+                  </form>
+                  <tree>
+                    <field name="id" string="RID"/>
+                    <field name="destination_company_partner_id"/>
+                    <field name="beneficiary_id"/>
+                    <field name="b_mobile"/>
+                    <field name="b_country_id"/>
+                    <field name="b_city_id"/>
+                    <field name="journal_id"/>
+                    <field name="amount" sum="amount"/>
+                  </tree>
+                </field>
+              </page>
+              <page string="Payment Details">
+                <field name="transaction_detail_ids" context="{'default_transaction_id': id}" readonly="1">
+                  <tree>
+                    <field name="date"/>
+                    <field name="journal_name"/>
+                    <field name="remarks"/>
+                    <field name="company_id"/>
+                    <field name="currency_id"/>
+                    <field name="transaction_id" invisible="1"/>
+                    <field name="amount"/>
+                  </tree>
+                </field>
+              </page>
+            </notebook>
+
+            <group string="Approval">
+              <group>
+                <field name="create_uid"/>
+                <field name="create_date"/>
+              </group>
+              <group>
+                <field name="approved_by" readonly="1"/>
+                <field name="approve_date" readonly="1"/>
+              </group>
+            </group>
+
+            <group class="oe_subtotal_footer oe_right">
+              <div class="oe_subtotal_footer_separator oe_inline">
+                  <label for="total" string="Total"/>
+              </div>
+              <field name="total" nolabel="1" class="oe_subtotal_footer_separator"/>
+
+              <!-- <div class="oe_subtotal_footer_separator oe_inline">
+                  <label for="paid_amount" string="Paid Amount"/>
+              </div>
+              <field name="paid_amount" nolabel="1" class="oe_subtotal_footer_separator"/> -->
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="mgs_remittance_transaction_search">
+      <field name="name">mgs_remittance.transaction.search</field>
+      <field name="model">mgs_remittance.transaction</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="name" string="Transaction#"/>
+          <field name="sender_id"/>
+          <field name="s_mobile"/>
+
+          <group expand="0" string="Group By..." colspan="12" col="10">
+            <filter string="Sender" name="sender_id" context="{'group_by': 'sender_id'}"></filter>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!-- Transaction Line Views -->
+    <record model="ir.ui.view" id="mgs_remittance_transaction_line_list">
+      <field name="name">mgs_remittance.transaction.line.tree</field>
+      <field name="model">mgs_remittance.transaction.line</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="related_transaction_id_no"/>
+          <field name="source_company_partner_id"/>
+          <field name="beneficiary_id"/>
+          <field name="b_mobile"/>
+          <field name="b_country_id"/>
+          <field name="b_city_id"/>
+          <field name="journal_id"/>
+          <field name="amount" sum="amount"/>
+        </tree>
+      </field>
+    </record>
+
+
+    <record model="ir.ui.view" id="mgs_remittance_transaction_line_form">
+      <field name="name">mgs_remittance.transaction.line.form</field>
+      <field name="model">mgs_remittance.transaction.line</field>
+      <field name="arch" type="xml">
+        <form>
+          <header>
+            <button name="%(mgs_remittance.action_mgs_payment_wizard1)d" string="Pay"
+                        type="action" class="btn-primary" data-hotkey="q" states="approved"/>
+            <button name="action_approve" string="Accept" type="object" class="oe_highlight" states="to_approve"/>
+            <!-- <button name="action_approve" string="Approve" type="object" class="oe_highlight" states="submited"/> -->
+            <field name="state" widget="statusbar"  statusbar_visible="draft,ready_to_pay,approved,paid"/>
+          </header>
+          <sheet>
+            <div class="oe_button_box" name="button_box">
+              <button name="button_open_journal_entry" type="object" class="oe_stat_button" icon="fa-bars" attrs="{'invisible': [('move_ids', '=', '[]')]}">
+                  Journal Entries
+                  <field name="move_ids" invisible="1"/>
+              </button>
+            </div>
+
+            <div class="oe_title" style="float:left;width:50%;margin-top:20px" attrs="{'invisible': [('is_against_transaction_line', '=', False)]}">
+              <h1><field name="related_transaction_id_no" string="Ref#" readonly="1"/></h1>
+            </div>
+            <group>
+              <group>
+                <field name="destination_company_partner_id" options="{'no_create': True, 'no_open': True}"/>
+                <field name="remit_date"/>
+              </group>
+
+              <group>
+                <field name="source_company_partner_id" options="{'no_create': True, 'no_open': True}"/>
+              </group>
+            </group>
+            
+            <group string="Sender Details">
+              <group>
+                <field name="sender_id" options="{'no_create': True}"/>
+                <field name="s_email"/>
+                <field name="s_country_id" options="{'no_create': True}"/>
+                <field name="s_remarks"/>
+              </group>
+
+              <group>
+                <field name="s_mobile"/>
+                <field name="s_id_no"/>
+                <field name="s_city_id" options="{'no_create': True}"/>
+                <field name="s_guarantor"/>
+              </group>
+            </group>
+
+            <group string="Beneficiary Details">
+              <group>
+                <field name="beneficiary_id" options="{'no_create': True}"/>
+                <field name="b_email"/>
+                <field name="b_country_id" required="1" options="{'no_create': True}"/>
+                <field name="b_remarks"/>
+                <field name="is_against_transaction_line" invisible="1"/>
+              </group>
+
+              <group>
+                <field name="b_mobile"/>
+                <field name="b_id_no"/>
+                <field name="b_city_id" options="{'no_create': True}"/>
+                <field name="b_guarantor"/>
+              </group>
+            </group>
+
+            <group>
+              <group string="Accounting">
+                <field name="journal_id" options="{'no_create': True}"/>
+                <field name="amount"/>
+                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
+                <field name="currency_id" groups="base.group_multi_currency" options="{'no_create': True}"/>
+              </group>
+
+              <group string="Commission">
+                <field name="apply_commission"/>
+                <field name="commission_amount" attrs="{'invisible': [('apply_commission', '=', False)]}"/>
+              </group>
+            </group>
+
+            <group string="Approval">
+              <group>
+                <field name="create_uid"/>
+                <field name="create_date"/>
+              </group>
+              <group>
+                <field name="approved_by" readonly="1"/>
+                <field name="approve_date" readonly="1"/>
+              </group>
+            </group>
+
+            <group class="oe_subtotal_footer oe_right">
+              <div class="oe_subtotal_footer_separator oe_inline">
+                  <label for="total" string="Total"/>
+              </div>
+              <field name="total" nolabel="1" class="oe_subtotal_footer_separator"/>
+
+              <div class="oe_subtotal_footer_separator oe_inline">
+                  <label for="amount_paid"/>
+              </div>
+              <field name="amount_paid" nolabel="1" class="oe_subtotal_footer_separator"/>
+              
+              <div class="oe_subtotal_footer_separator oe_inline">
+                  <label for="amount_due"/>
+              </div>
+              <field name="amount_due" nolabel="1" class="oe_subtotal_footer_separator"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="mgs_remittance_transaction_line_search">
+      <field name="name">mgs_remittance.transaction.line.search</field>
+      <field name="model">mgs_remittance.transaction.line</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="related_transaction_id_no" string="RID#"/>
+          <field name="sender_id"/>
+          <field name="s_mobile"/>
+
+          <field name="beneficiary_id"/>
+          <field name="b_mobile"/>
+
+          <group expand="0" string="Group By..." colspan="12" col="10">
+            <filter string="Sender" name="sender_id" context="{'group_by': 'sender_id'}"></filter>
+            <filter string="Beneficiary" name="beneficiary_id" context="{'group_by': 'beneficiary_id'}"></filter>
+            <filter string="Source Aegent" name="source_company_partner_id" context="{'group_by': 'source_company_partner_id'}"></filter>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!-- Source Trans -->
+    <record model="ir.ui.view" id="mgs_remittance_source_trans_line_list">
+      <field name="name">mgs_remittance.transaction.line.tree</field>
+      <field name="model">mgs_remittance.transaction.line</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="destination_company_partner_id"/>
+          <field name="beneficiary_id"/>
+          <field name="b_mobile"/>
+          <field name="b_country_id"/>
+          <field name="b_city_id"/>
+          <field name="journal_id"/>
+          <field name="amount" sum="amount"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="mgs_remittance_source_trans_search">
+      <field name="name">mgs_remittance.transaction.line.search</field>
+      <field name="model">mgs_remittance.transaction.line</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="id" string="RID#"/>
+          <field name="sender_id"/>
+          <field name="s_mobile"/>
+
+          <field name="beneficiary_id"/>
+          <field name="b_mobile"/>
+
+          <group expand="0" string="Group By..." colspan="12" col="10">
+            <filter string="Sender" name="sender_id" context="{'group_by': 'sender_id'}"></filter>
+            <filter string="Beneficiary" name="beneficiary_id" context="{'group_by': 'beneficiary_id'}"></filter>
+            <filter string="Destination Aegent" name="destination_company_partner_id" context="{'group_by': 'destination_company_partner_id'}"></filter>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!-- Actions -->
+    <record model="ir.actions.act_window" id="mgs_remittance_transaction_action">
+      <field name="name">Transactions</field>
+      <field name="res_model">mgs_remittance.transaction</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="mgs_remittance_source_trans_action">
+      <field name="name">Source Transactions</field>
+      <field name="res_model">mgs_remittance.transaction.line</field>
+      <field name="view_mode">tree,form</field>
+      <field name="search_view_id" ref="mgs_remittance_source_trans_search"/>
+    </record>
+
+    <record id="mgs_remittance_transaction_action_tree" model="ir.actions.act_window.view">
+      <field name="view_mode">tree</field>
+      <field name="view_id" ref="mgs_remittance_source_trans_line_list" />
+      <field name="act_window_id" ref="mgs_remittance_source_trans_action" />
+    </record>
+
+    <record model="ir.actions.act_window" id="mgs_remittance_transaction_line_action">
+      <field name="name">Payouts</field>
+      <field name="res_model">mgs_remittance.transaction.line</field>
+      <field name="view_mode">tree,form</field>
+      <field name="domain">[('is_against_transaction_line','=', True)]</field>
+      <field name="context">{'create': False,'edit': False,'delete': False}</field>
+      <field name="search_view_id" ref="mgs_remittance_transaction_line_search"/>
+    </record>
+  </data>
+</odoo>

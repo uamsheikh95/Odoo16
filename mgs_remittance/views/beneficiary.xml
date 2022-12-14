@@ -1,0 +1,88 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="mgs_remittance_beneficiary_list">
+      <field name="name">mgs_remittance.beneficiary.tree</field>
+      <field name="model">mgs_remittance.beneficiary</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="mobile"/>
+          <field name="email"/>
+          <field name="country_id"/>
+          <field name="city_id"/>
+          <field name="id_no"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="mgs_remittance_beneficiary_form">
+      <field name="name">mgs_remittance.beneficiary.form</field>
+      <field name="model">mgs_remittance.beneficiary</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <div class="oe_title" style="float:left;width:50%;margin-top:20px">
+              <h1><field name="name" string="Order#"/></h1>
+            </div>
+            <group>
+              <group>
+                <field name="mobile"/>
+                <field name="country_id" options="{'no_create': True}"/>
+                <field name="id_no"/>
+              </group>
+
+              <group>
+                <field name="email"/>
+                <field name="city_id" options="{'no_create': True}"/>
+                <field name="partner_id"/>
+              </group>
+            </group>
+
+            <!-- <notebook>
+              <page string="Payment Details">
+                <field name="beneficiary_detail_ids" context="{'default_beneficiary_id': id}" readonly="1">
+                  <tree>
+                    <field name="date"/>
+                    <field name="journal_name"/>
+                    <field name="remarks"/>
+                    <field name="company_id"/>
+                    <field name="currency_id"/>
+                    <field name="beneficiary_id" invisible="1"/>
+                    <field name="amount"/>
+                  </tree>
+                </field>
+              </page>
+            </notebook> -->
+          </sheet>
+          <div class="oe_chatter">
+            <field name="message_follower_ids" widget="mail_followers"/>
+            <field name="message_ids" widget="mail_thread"/>
+          </div>
+        </form>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="mgs_remittance_beneficiary_search">
+      <field name="name">mgs_remittance.beneficiary.search</field>
+      <field name="model">mgs_remittance.beneficiary</field>
+      <field name="arch" type="xml">
+        <search>
+          <field name="name" string="beneficiary"/>
+          <field name="mobile"/>
+          <field name="email"/>
+
+          <group expand="0" string="Group By..." colspan="12" col="10">
+            <filter string="Country" name="country_id" context="{'group_by': 'country_id'}"></filter>
+            <filter string="City" name="city_id" context="{'group_by': 'city_id'}"></filter>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="mgs_remittance_beneficiary_action">
+      <field name="name">Beneficiarys</field>
+      <field name="res_model">mgs_remittance.beneficiary</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+  </data>
+</odoo>

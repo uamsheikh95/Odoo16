@@ -1,0 +1,85 @@
+<odoo>
+  <record id="res_config_settings_view_form" model="ir.ui.view">
+    <field name="name">res.config.settings.view.form.inherit.tailor</field>
+    <field name="model">res.config.settings</field>
+    <field name="priority" eval="40"/>
+    <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//div[hasclass('settings')]" position="inside">
+        <div class="app_settings_block" data-string="Remmittance" string="Remmittance" data-key="mgs_remmittance">
+            <h2>Operations</h2>
+            <div class="row mt16 o_settings_container">
+              <!-- Journal-->
+              <div class="col-12 col-lg-6 o_setting_box">
+                <div class="o_setting_left_pane"/>
+                <div class="o_setting_right_pane">
+                    <span class="o_form_label">Commission Income Account</span>
+                    <div class="text-muted">
+                        Default account for remmittance commissions
+                    </div>
+                    <div class="content-group">
+                        <div class="row mt16">
+                            <label for="remmitence_commission_account_id" class="col-lg-3 o_light_label"/>
+                            <field name="remmitence_commission_account_id" options="{'no_create_edit': True, 'no_open': True}" context="{'active_test': False}"/>
+                        </div>
+                    </div>
+                </div>
+              </div>
+
+              <!-- <div class="col-12 col-lg-6 o_setting_box">
+                <div class="o_setting_left_pane"/>
+                <div class="o_setting_right_pane">
+                    <span class="o_form_label">Default Journal</span>
+                    <div class="text-muted">
+                        Default journal for jouranl entries
+                    </div>
+                    <div class="content-group">
+                        <div class="row mt16">
+                            <label for="remmitence_payout_journal_id" class="col-lg-3 o_light_label"/>
+                            <field name="remmitence_payout_journal_id" aria-label="Values set here are company-specific." options="{'no_create_edit': True, 'no_open': True}" context="{'active_test': False}"/>
+                        </div>
+                    </div>
+                </div>
+              </div> -->
+               <div class="col-12 col-lg-6 o_setting_box" id="sale_config_online_confirmation_sign">
+                  <div class="o_setting_left_pane">
+                      
+                  </div>
+                  <div class="o_setting_right_pane">
+                      <label for="remmitence_payout_journal_id"/>
+                      <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." groups="base.group_multi_company"/>
+                      <div class="text-muted">
+                          Request an online signature to confirm orders
+                      </div>
+                      <field name="remmitence_payout_journal_id"/>
+                  </div>
+              </div>
+
+               <div class="col-12 col-lg-6 o_setting_box" id="sale_config_online_confirmation_sign">
+                  <div class="o_setting_left_pane">
+                      
+                  </div>
+                  <div class="o_setting_right_pane">
+                      <label for="company_id"/>
+                      <span class="fa fa-lg fa-building-o" title="Values set here are company-specific." groups="base.group_multi_company"/>
+                      <div class="text-muted">
+                          Request an online signature to confirm orders
+                      </div>
+                      <field name="company_id"/>
+                  </div>
+              </div>
+            </div> <!-- Journal & Location-->
+          </div>
+      </xpath>
+    </field>
+  </record>
+
+  <record id="mgs_remittance_config_action" model="ir.actions.act_window">
+    <field name="name">Settings</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">res.config.settings</field>
+    <field name="view_mode">form</field>
+    <field name="target">inline</field>
+    <field name="context">{'module' : 'mgs_remmittance'}</field>
+  </record>
+</odoo>

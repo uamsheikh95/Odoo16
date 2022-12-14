@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<report
+		 id="action_report_non_moving_items"
+		 name="mgs_inventory.non_moving_items_report"
+		 model="mgs_inventory.non_moving_items_report"
+		 string="Non Moving Items"
+		 report_type="qweb-html"
+		 paperformat="mgs_inventory_paperformat"
+		 />
+
+		<template id="non_moving_items_report">
+				<t t-call="web.html_container">
+					<t t-foreach="docs" t-as="doc">
+						 <t t-call="web.internal_layout" t-lang="en_US">
+								<div class="page">
+										<div class="container" style="font-size:12px;font-family:Arial;margin-top:1px;">
+											<div class="text-center" style="margin-top:4px;font-size: 18px; font-weight: bold;">Non Moving Items</div>
+
+											<div id="informations" class="row mt2 mb2">
+
+												<div class="col-auto mw-100 mb-2" t-if="from_date" style="width: 20%; float: left;">
+													<strong>Date from:</strong>
+													<p class="m-0" t-esc="from_date"/>
+												</div>
+												<div class="col-auto mw-100 mb-2" t-if="to_date" style="width: 20%; float: left;">
+													<strong>Date to:</strong>
+													<p class="m-0" t-esc="to_date"/>
+												</div>
+
+
+												<div class="col-auto mw-100 mb-2" t-if="company_id.id" style="width: 20%; float: left;" groups="base.group_multi_company">
+													<strong>Company:</strong>
+													<p class="m-0" t-esc="company_id.name"/>
+												</div>
+											</div>
+
+											<div class="row">
+												<table style="width:100%;">
+													<thead style="border-bottom:1px solid #dddddd;border-top:1px solid #dddddd">
+														<tr style="background-color: #F2F4F4;">
+															<th nowrap="nowrap">Product</th>
+															<th style="text-align:right" nowrap="nowrap">Available Qty</th>
+														</tr>
+													</thead>
+
+													<tbody>
+                              <t t-set="total_aty_all" t-value="0"/>
+                              <tr t-foreach="lines(from_date, to_date, stock_location_ids, company_id.id)" t-as="line">
+                                <td><span t-esc="line['product_name']['en_US']"/></td>
+                                <td style="text-align:right"><span t-esc="'{0:,.2f}'.format(line['total_qty'])"/></td>
+                                <t t-set="total_aty_all" t-value="total_aty_all+line['total_qty']"/>
+                              </tr>
+
+                              <tr style="font-weight: bold">
+                                <td></td>
+                                <td style="text-align:right"><span t-esc="'{0:,.2f}'.format(total_aty_all)"/></td>
+                              </tr>
+													</tbody>
+												</table>
+											</div> <!--tow-->
+
+
+										</div> <!--container-->
+								</div> <!--page-->
+							</t> <!--web.external_layout-->
+						</t>
+				</t> <!--web.html_container-->
+		</template>
+</odoo>

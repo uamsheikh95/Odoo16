@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+		<record id="pr_moves_history_form" model="ir.ui.view">
+			<field name="name">mgs_inventory.pr_moves_history.form</field>
+			<field name="model">mgs_inventory.pr_moves_history</field>
+			<field name="arch" type="xml">
+				 <form>
+					<sheet>
+						<group>
+							<group>
+								<field name="date_from" string = "From" required="1" />
+								<field name="product_id" string="Product" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True}" />
+								<field name="warehouse_id" invisible="1" string="Warehouse" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True}" />
+								<field name="stock_location_ids"  string="Location" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True}" widget="many2many_tags"/>
+								<field name="partner_id" string="Partner" options="{'no_create': True, 'no_quick_create': True, 'no_create_edit':True}" />
+								<field name="include_reserved" />
+								<field name="show_reserved_only" attrs="{'invisible':[('include_reserved', '=', False)]}" />
+							</group>
+							<group>
+								<field name="date_to" string="To" required="1" />
+								<field name="view" widget="radio"/>
+								<!-- <field name='company_branch_id' groups="odoo_multi_branch.group_multi_branches" widget="selection" options="{'no_create': True}"/> -->
+								<field name="company_id" groups="base.group_multi_company" />
+								<field name="order_id" />
+							</group>
+						</group>
+					</sheet>
+
+				<footer>
+					<button name="confirm" string="View" type="object" class="oe_highlight"/>
+					<button string="Cancel" special="cancel"/>
+				</footer>
+
+				 </form>
+			</field>
+		</record>
+
+
+
+		<record id="action_pr_moves_history_form" model="ir.actions.act_window">
+			<field name="name">MGS Product Moves History Report</field>
+			<field name="res_model">mgs_inventory.pr_moves_history</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_mode">form</field>
+			<field name="view_id" ref="pr_moves_history_form"/>
+			<field name="target">new</field>
+		</record>
+
+
+		<menuitem id="menu_pr_moves_history" name="Product Moves History" parent="mgs_inventory_root" action="action_pr_moves_history_form" sequence="1" />
+
+</odoo>

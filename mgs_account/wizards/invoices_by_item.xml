@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+		<record id="invoices_by_item_form" model="ir.ui.view">
+			<field name="name">mgs_account.invoices_by_item.form</field>
+			<field name="model">mgs_account.invoices_by_item</field>
+			<field name="arch" type="xml">
+			   <form>
+					<sheet>
+						<group>
+							<group>
+								<field name="date_from" string = "From"/>
+								<field name="product_id" options="{'no_create': True}" />
+                                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}" />
+							</group>
+
+
+							<group>
+								<field name="date_to" string="To"/>
+								<field name="invoices_bills" required="1"/>
+								<field name="report_by" widget="radio"/>
+							</group>
+						</group>
+					</sheet>
+
+				<footer>
+					<button name="confirm" string="View" type="object" class="oe_highlight"/>
+					<button string="Cancel" special="cancel"/>
+				</footer>
+
+			   </form>
+			</field>
+		</record>
+
+
+
+		<record id="action_invoices_by_item_report" model="ir.actions.act_window">
+			<field name="name">MGS Invoices by Item Report</field>
+			<field name="res_model">mgs_account.invoices_by_item</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_id" ref="invoices_by_item_form"/>
+			<field name="target">new</field>
+		</record>
+
+
+    <menuitem id="menu_invoices_by_item_report" name="Invoices by Item" parent="menu_mgs_account_report" action="action_invoices_by_item_report" sequence="2" />
+
+</odoo>

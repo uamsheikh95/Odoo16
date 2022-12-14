@@ -1,0 +1,54 @@
+<odoo>
+     <record id="search_trans_wizard_form" model="ir.ui.view">
+            <field name="name">mgs_remittance.search_trans.wiz</field>
+            <field name="model">mgs_remittance.search_trans</field>
+            <field name="arch" type="xml">
+                <form string="Create Remittance Payment">
+                    <group>
+                        <group>
+                            <field name="rem_id"/>
+                        </group>
+                        <group>
+                            <!-- <field name="state"/> -->
+                        </group>
+                    </group>
+
+                    <group string="Source Details">
+                        <group>
+                            <field name="date"/>
+                            <field name="amount"/>
+                            <field name="sender_id"/>
+                        </group>
+                        <group>
+                            <field name="state"/>
+                            <field name="source_company_partner_id"/>
+                            <field name="s_country_id"/>
+                        </group>
+                    </group>
+
+                    <group string="Destination Details">
+                        <group>
+                            <field name="destination_company_partner_id"/>
+                            <field name="b_city_id"/>
+                            <field name="b_mobile"/>
+                        </group>
+                        <group>
+                            <field name="s_country_id"/>
+                            <field name="beneficiary_id"/>
+                            <!-- <field name="s_country_id"/> -->
+                        </group>
+                    </group>
+                    <footer>
+                        <button string="Close" class="btn-default" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_search_trans_wizard">
+      <field name="name">Search Transaction</field>
+      <field name="res_model">mgs_remittance.search_trans</field>
+      <field name="view_id" ref="search_trans_wizard_form"/>
+      <field name="target">new</field>
+    </record>
+</odoo>
