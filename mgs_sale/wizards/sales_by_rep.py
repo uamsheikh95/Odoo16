@@ -71,7 +71,7 @@ class SalesbyRepDetailReport(models.AbstractModel):
             query += """ and sr.date <= %s"""
 
         if product_id:
-            query += """ and sr.product_id = """ + str(product_id)
+            query += """ and pp.id = """ + str(product_id)
 
         if partner_id:
             query += """ and sr.partner_id = """ + str(partner_id)
