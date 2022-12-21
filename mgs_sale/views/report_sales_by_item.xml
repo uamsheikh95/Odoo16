@@ -64,18 +64,18 @@
                             <table class="table table-condensed table-sm">
                                 <thead>
                                     <tr>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap">Item</th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap"><t t-if="report_by == 'Detail'">Date</t></th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap"><t t-if="report_by == 'Detail'">Order</t></th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap"><t t-if="report_by == 'Detail'">Customer</t></th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" style="text-align: right" nowrap="nowrap">Ordered Qty</th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" style="text-align: right" nowrap="nowrap">Delivered Qty</th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" style="text-align: right" nowrap="nowrap">Invoiced Qty</th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" style="text-align: right" nowrap="nowrap">To Invoice Qty</th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" style="text-align: right" nowrap="nowrap"><t t-if="report_by == 'Detail'">Rate</t></th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" style="text-align: right" nowrap="nowrap">Amount</th>
+                                        <th nowrap="nowrap">Item</th>
+                                        <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Date</t></th>
+                                        <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Order</t></th>
+                                        <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Customer</t></th>
+                                        <th style="text-align: right" nowrap="nowrap">Ordered Qty</th>
+                                        <th style="text-align: right" nowrap="nowrap">Delivered Qty</th>
+                                        <th style="text-align: right" nowrap="nowrap">Invoiced Qty</th>
+                                        <th style="text-align: right" nowrap="nowrap">To Invoice Qty</th>
+                                        <th style="text-align: right" nowrap="nowrap"><t t-if="report_by == 'Detail'">Rate</t></th>
+                                        <th style="text-align: right" nowrap="nowrap">Amount</th>
                                         <th style="text-align: right" nowrap="nowrap" groups="account.group_account_manager">T.Cost</th>
-                                        <th groups="account.group_account_manager" style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" style="text-align: right" nowrap="nowrap">Margin</th>
+                                        <th groups="account.group_account_manager" style="text-align: right" nowrap="nowrap">Margin</th>
                                     </tr>
                                 </thead>
 
@@ -83,7 +83,7 @@
                                     <t t-foreach="lines(date_from, date_to, company_id.id, product_id[0], user_id[0], 'all')" t-as="main">
                                         <t t-foreach="lines(date_from, date_to, company_id.id, product_id[0], user_id[0], 'yes')" t-as="product">
                                             <tr t-if="report_by == 'Detail'" style="color: red; font-weight: bold;">
-                                                <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" colspan="10"><span t-esc="product['product_name']['en_US']"/></td>
+                                                <td colspan="10"><span t-esc="product['product_name']['en_US']"/></td>
                                                 <td colspan="2" groups="account.group_account_manager"/>
                                             </tr>
 
