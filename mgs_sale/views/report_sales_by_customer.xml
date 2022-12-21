@@ -64,10 +64,10 @@
                                         <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Order</t></th>
                                         <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Salesperson</t></th>
                                         <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Item</t></th>
-                                        <th class="text-center" nowrap="nowrap">Ordered Qty</th>
-                                        <th class="text-center" nowrap="nowrap">Delivered Qty</th>
-                                        <th class="text-center" nowrap="nowrap">Invoiced Qty</th>
-                                        <th class="text-center" nowrap="nowrap">To Invoice Qty</th>
+                                        <th class="text-right" nowrap="nowrap">Ordered Qty</th>
+                                        <th class="text-right" nowrap="nowrap">Delivered Qty</th>
+                                        <th class="text-right" nowrap="nowrap">Invoiced Qty</th>
+                                        <th class="text-right" nowrap="nowrap">To Invoice Qty</th>
                                         <th class="text-right" nowrap="nowrap"><t t-if="report_by == 'Detail'">Rate</t></th>
                                         <th class="text-right" nowrap="nowrap">Amount</th>
                                         <th class="text-right" nowrap="nowrap" groups="account.group_account_manager">T.Cost</th>

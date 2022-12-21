@@ -61,7 +61,7 @@
                                         <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Date</t></th>
                                         <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Order</t></th>
                                         <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Item</t></th>
-                                        <th class="text-center" nowrap="nowrap">Quantity</th>
+                                        <th class="text-right" nowrap="nowrap">Quantity</th>
                                         <th class="text-right" nowrap="nowrap"><t t-if="report_by == 'Detail'">Rate</t></th>
                                         <th class="text-right" nowrap="nowrap">Amount</th>
                                     </tr>

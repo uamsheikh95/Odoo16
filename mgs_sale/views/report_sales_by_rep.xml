@@ -70,10 +70,10 @@
                                         <th>Order</th>
                                         <th>Partner</th>
                                         <th>Item</th>
-                                        <th class="text-center">Ordered Qty</th>
-                                        <th class="text-center">Delivered Qty</th>
-                                        <th class="text-center">Invoiced Qty</th>
-                                        <th class="text-center">To Invoice Qty</th>
+                                        <th class="text-right">Ordered Qty</th>
+                                        <th class="text-right">Delivered Qty</th>
+                                        <th class="text-right">Invoiced Qty</th>
+                                        <th class="text-right">To Invoice Qty</th>
                                         <th class="text-right">Rate</th>
                                         <th class="text-right">Amount</th>
                                     </tr>

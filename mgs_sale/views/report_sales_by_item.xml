@@ -68,10 +68,10 @@
                                         <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap"><t t-if="report_by == 'Detail'">Date</t></th>
                                         <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap"><t t-if="report_by == 'Detail'">Order</t></th>
                                         <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" nowrap="nowrap"><t t-if="report_by == 'Detail'">Customer</t></th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-center" nowrap="nowrap">Ordered Qty</th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-center" nowrap="nowrap">Delivered Qty</th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-center" nowrap="nowrap">Invoiced Qty</th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-center" nowrap="nowrap">To Invoice Qty</th>
+                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right" nowrap="nowrap">Ordered Qty</th>
+                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right" nowrap="nowrap">Delivered Qty</th>
+                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right" nowrap="nowrap">Invoiced Qty</th>
+                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right" nowrap="nowrap">To Invoice Qty</th>
                                         <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right" nowrap="nowrap"><t t-if="report_by == 'Detail'">Rate</t></th>
                                         <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right" nowrap="nowrap">Amount</th>
                                         <th class="text-right" nowrap="nowrap" groups="account.group_account_manager">T.Cost</th>
