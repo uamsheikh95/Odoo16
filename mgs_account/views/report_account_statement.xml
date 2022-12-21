@@ -108,15 +108,15 @@
                                             <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" colspan="5">
                                                 <span style="color: red; font-weight: bold;" t-if="report_by == 'detail'">TOTAL <span t-esc="account['group']" /></span>
                                             </td>
-                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" style="text-align: right">
+                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;text-align: right">
                                                 <span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(account['total_debit'])" t-if="report_by == 'detail'"/>
                                                 <span t-esc="'{0:,.2f}'.format(account['total_debit'])" t-if="report_by == 'summary'"/>
                                             </td>
-                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" style="text-align: right">
+                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529">
                                                 <span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(account['total_credit'])" t-if="report_by == 'detail'"/>
                                                 <span t-esc="'{0:,.2f}'.format(account['total_credit'])"  t-if="report_by == 'summary'"/>
                                             </td>
-                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" style="text-align: right">
+                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529">
                                                 <span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(balance)"  t-if="report_by == 'detail'"/>
                                                 <span t-esc="'{0:,.2f}'.format(balance)"  t-if="report_by == 'summary'"/>
                                             </td>
