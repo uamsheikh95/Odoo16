@@ -70,12 +70,12 @@
                                         <th>Order</th>
                                         <th>Partner</th>
                                         <th>Item</th>
-                                        <th class="text-right">Ordered Qty</th>
-                                        <th class="text-right">Delivered Qty</th>
-                                        <th class="text-right">Invoiced Qty</th>
-                                        <th class="text-right">To Invoice Qty</th>
-                                        <th class="text-right">Rate</th>
-                                        <th class="text-right">Amount</th>
+                                        <th style="text-align: right">Ordered Qty</th>
+                                        <th style="text-align: right">Delivered Qty</th>
+                                        <th style="text-align: right">Invoiced Qty</th>
+                                        <th style="text-align: right">To Invoice Qty</th>
+                                        <th style="text-align: right">Rate</th>
+                                        <th style="text-align: right">Amount</th>
                                     </tr>
                                 </thead>
 
@@ -92,16 +92,16 @@
                                         <td><span t-esc="line['order_no']"/></td>
                                         <td><span t-esc="line['partner']"/></td>
                                         <td><span t-esc="line['product_name']['en_US']"/></td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['product_uom_qty'])"/></td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['qty_delivered'])"/></td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['qty_invoiced'])"/></td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['qty_to_invoice'])"/></td>
-                                        <td class="text-right">
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(line['product_uom_qty'])"/></td>
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(line['qty_delivered'])"/></td>
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(line['qty_invoiced'])"/></td>
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(line['qty_to_invoice'])"/></td>
+                                        <td style="text-align: right">
                                             <t t-set="rate" t-value="0"/>
                                             <t t-set="rate" t-value="line['price_total']/line['product_uom_qty']" t-if="line['product_uom_qty'] and line['price_total']"/>
                                             <span t-esc="'{0:,.2f}'.format(rate)"/>
                                         </td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['price_total'])" t-if="line['price_total']"/></td>
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(line['price_total'])" t-if="line['price_total']"/></td>
 
                                         <t t-set="total_product_uom_qty" t-value="total_product_uom_qty+line['product_uom_qty']"/>
                                         <t t-set="total_qty_delivered" t-value="total_qty_delivered+line['qty_delivered']"/>
@@ -115,12 +115,12 @@
                                         <td></td>
                                         <td></td>
                                         <td></td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(total_product_uom_qty)"/></td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(total_qty_delivered)"/></td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(total_qty_invoiced)"/></td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(total_qty_to_invoice)"/></td>
-                                        <td class="text-right"></td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(total_amount)"/></td>
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(total_product_uom_qty)"/></td>
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(total_qty_delivered)"/></td>
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(total_qty_invoiced)"/></td>
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(total_qty_to_invoice)"/></td>
+                                        <td style="text-align: right"></td>
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(total_amount)"/></td>
 
                                     </tr>
                                 </tbody>

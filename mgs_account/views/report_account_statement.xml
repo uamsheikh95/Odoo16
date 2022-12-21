@@ -49,9 +49,9 @@
                                         <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"><t t-if="report_by == 'detail'">Partner</t></th>
                                         <!-- <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"><t t-if="report_by == 'detail'">Analytic Account</t></th> -->
                                         <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"><t t-if="report_by == 'detail'">Label</t></th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-center">Debit</th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-center">Credit</th>
-                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right">Balance</th>
+                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" style="text-align: right">Debit</th>
+                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" style="text-align: right">Credit</th>
+                                        <th style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" style="text-align: right">Balance</th>
                                     </tr>
                                 </thead>
 
@@ -63,7 +63,7 @@
 
                                         <tr t-if="report_by == 'detail'" style="color: red; font-weight: bold;">
                                             <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" colspan="7"><span t-esc="account['group']"/></td>
-                                            <td class="text-right" style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"><span t-if="date_from" t-esc="'{0:,.2f}'.format(balance)"/></td>
+                                            <td style="text-align: right" style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"><span t-if="date_from" t-esc="'{0:,.2f}'.format(balance)"/></td>
                                         </tr>
 
 
@@ -76,10 +76,10 @@
                                                 <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"><span t-esc="line['partner_name']"/></td>
                                                 <!-- <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"><span t-esc="line['analytic_account_name']"/></td> -->
                                                 <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"><t t-if="line['move_ref']"><span t-esc="line['move_ref']"/>: </t><span t-esc="line['label']"/></td>
-                                                <td nowrap="nowrap" style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right"><span t-esc="'{0:,.2f}'.format(line['debit'])"/></td>
-                                                <td nowrap="nowrap" style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right"><span t-esc="'{0:,.2f}'.format(line['credit'])"/></td>
+                                                <td nowrap="nowrap" style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" style="text-align: right"><span t-esc="'{0:,.2f}'.format(line['debit'])"/></td>
+                                                <td nowrap="nowrap" style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" style="text-align: right"><span t-esc="'{0:,.2f}'.format(line['credit'])"/></td>
                                                 <t t-set="balance" t-value="balance+line['debit']-line['credit']"/>
-                                                <td nowrap="nowrap" style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" class="text-right"><span t-esc="'{0:,.2f}'.format(balance)"/></td>
+                                                <td nowrap="nowrap" style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" style="text-align: right"><span t-esc="'{0:,.2f}'.format(balance)"/></td>
                                             </tr>
                                         </t>
 
@@ -87,13 +87,13 @@
                                             <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" colspan="6">
                                                 <span style="color: red; font-weight: bold;" t-if="report_by == 'detail'">BALANCE ON DATE</span>
                                             </td>
-                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" class="text-right">
+                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" style="text-align: right">
 
                                             </td>
-                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" class="text-right">
+                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" style="text-align: right">
 
                                             </td>
-                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" class="text-right">
+                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" style="text-align: right">
                                                 <span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(balance-open_balance)"/>
                                             </td>
                                         </tr> -->
@@ -102,15 +102,15 @@
                                             <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" colspan="5">
                                                 <span style="color: red; font-weight: bold;" t-if="report_by == 'detail'">TOTAL <span t-esc="account['group']" /></span>
                                             </td>
-                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" class="text-right">
+                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" style="text-align: right">
                                                 <span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(account['total_debit'])" t-if="report_by == 'detail'"/>
                                                 <span t-esc="'{0:,.2f}'.format(account['total_debit'])" t-if="report_by == 'summary'"/>
                                             </td>
-                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" class="text-right">
+                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" style="text-align: right">
                                                 <span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(account['total_credit'])" t-if="report_by == 'detail'"/>
                                                 <span t-esc="'{0:,.2f}'.format(account['total_credit'])"  t-if="report_by == 'summary'"/>
                                             </td>
-                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" class="text-right">
+                                            <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529" style="text-align: right">
                                                 <span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(balance)"  t-if="report_by == 'detail'"/>
                                                 <span t-esc="'{0:,.2f}'.format(balance)"  t-if="report_by == 'summary'"/>
                                             </td>

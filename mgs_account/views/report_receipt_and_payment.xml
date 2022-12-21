@@ -70,7 +70,7 @@
                                         <th>Partner</th>
                                         <th t-if="not journal_id[0]">Journal</th>
                                         <th>Ref</th>
-                                        <th class="text-right">Total</th>
+                                        <th style="text-align: right">Total</th>
                                     </tr>
                                 </thead>
 
@@ -82,14 +82,14 @@
                                         <td><span t-esc="line['partner_name']"/></td>
                                         <td t-if="not journal_id[0]"><span t-esc="line['journal_name']"/></td>
                                         <td><span t-esc="line['ref']"/></td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['amount_paid'])"/></td>
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(line['amount_paid'])"/></td>
 
                                         <!-- <td nowrap="nowrap"><span t-esc="line.date"/></td>
                                         <td><span t-esc="line.name"/></td>
                                         <td><span t-esc="line.partner_id.name"/></td>
                                         <td t-if="not journal_id[0]"><span t-esc="line.journal_id.name"/></td>
                                         <td><span t-esc="line.ref"/></td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line.amount)"/></td> -->
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(line.amount)"/></td> -->
 
                                         <t t-set="total_amount" t-value="total_amount+line['amount_paid']"/>
                                     </tr>
@@ -97,7 +97,7 @@
                                     <tr style="font-weight: bold;font-size: 13px">
                                         <td colspan="4"></td>
                                         <td t-if="not journal_id[0]"/>
-                                        <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(total_amount)"/></td>
+                                        <td style="text-align: right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(total_amount)"/></td>
                                     </tr>
                                 </tbody>
                             </table>

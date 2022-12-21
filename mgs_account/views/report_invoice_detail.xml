@@ -76,9 +76,9 @@
                                         <th>Number</th>
                                         <th>Partner</th>
                                         <th>Item</th>
-                                        <th class="text-right">Quantity</th>
-                                        <th class="text-right">Rate</th>
-                                        <th class="text-right">Amount</th>
+                                        <th style="text-align: right">Quantity</th>
+                                        <th style="text-align: right">Rate</th>
+                                        <th style="text-align: right">Amount</th>
                                     </tr>
                                 </thead>
 
@@ -90,13 +90,13 @@
                                         <td><span t-esc="line['ref']"/></td>
                                         <td><span t-esc="line['partner']"/></td>
                                         <td><span t-esc="line['product']"/></td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['quantity'])"/></td>
-                                        <td class="text-right">
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(line['quantity'])"/></td>
+                                        <td style="text-align: right">
                                             <t t-set="rate" t-value="0"/>
                                             <t t-set="rate" t-value="line['amount_total']/line['quantity']" t-if="line['quantity'] and line['amount_total']"/>
                                             <span t-esc="'{0:,.2f}'.format(rate)"/>
                                         </td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['amount_total'])" t-if="line['amount_total']"/></td>
+                                        <td style="text-align: right"><span t-esc="'{0:,.2f}'.format(line['amount_total'])" t-if="line['amount_total']"/></td>
 
                                         <t t-set="total_qty" t-value="total_qty+line['quantity']"/>
                                         <t t-set="total_amount" t-value="total_amount+line['amount_total']"/>
@@ -104,9 +104,9 @@
 
                                     <tr style="font-weight: bold;font-size: 13px">
                                         <td colspan="4"></td>
-                                        <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(total_qty)"/></td>
-                                        <td class="text-right"></td>
-                                        <td class="text-right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(total_amount)"/></td>
+                                        <td style="text-align: right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(total_qty)"/></td>
+                                        <td style="text-align: right"></td>
+                                        <td style="text-align: right"><span style="color: red; font-weight: bold;" t-esc="'{0:,.2f}'.format(total_amount)"/></td>
                                     </tr>
                                 </tbody>
                             </table>
