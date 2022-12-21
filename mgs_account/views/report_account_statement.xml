@@ -63,7 +63,7 @@
 
                                         <tr t-if="report_by == 'detail'" style="color: red; font-weight: bold;">
                                             <td style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;" colspan="7"><span t-esc="account['group']"/></td>
-                                            <td style="text-align: right" style="padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"><span t-if="date_from" t-esc="'{0:,.2f}'.format(balance)"/></td>
+                                            <td style="text-align: right;padding: 0.30rem;border-top: 1px solid #212529;border-bottom: 1px solid #212529;"><span t-if="date_from" t-esc="'{0:,.2f}'.format(balance)"/></td>
                                         </tr>
 
 
