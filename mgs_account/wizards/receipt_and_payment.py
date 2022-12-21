@@ -61,7 +61,12 @@ class ReceiptAndPaymentReport(models.AbstractModel):
         left join account_move as am on aml.move_id=am.id
         left join account_account as aa on aml.account_id=aa.id
         where aa.account_type = %s
-        and aml.credit > 0 and aj.type in ('bank', 'cash')"""
+        and aj.type in ('bank', 'cash')"""
+
+        if p_type == 'asset_receivable':
+            query += """ and aml.credit > 0 """
+        else:
+            query += """ and aml.debit > 0 """
 
         if date_from:
             params.append(date_from)
