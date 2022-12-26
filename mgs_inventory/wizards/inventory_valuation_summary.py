@@ -41,8 +41,7 @@ class ValuationSummary(models.TransientModel):
 
     def export_to_excel(self):
         valuation_report_obj = self.env['report.mgs_inventory.valuation_summary_report']
-        lines = valuation_report_obj._lines(
-            self.date, self.categ_id.id, self.product_id.id, self.company_id.id, 'product')
+        lines = valuation_report_obj._lines
         get_avg_cost = valuation_report_obj._get_avg_cost
         fp = BytesIO()
         workbook = xlsxwriter.Workbook(fp)
@@ -90,36 +89,71 @@ class ValuationSummary(models.TransientModel):
         # Sub headers
         row += 2
         column = -1
-        worksheet.write(row, column+1, 'Item Code', cell_text_format)
-        worksheet.write(row, column+2, 'Item Description', cell_text_format)
-        worksheet.write(row, column+3, 'On Hand', cell_number_format)
-        worksheet.write(row, column+4, 'Avg Cost', cell_number_format)
-        worksheet.write(row, column+5, 'Asset Value', cell_number_format)
-        worksheet.write(row, column+6, 'Sales Price', cell_number_format)
-        worksheet.write(row, column+7, 'Retail Value', cell_number_format)
+        worksheet.write(row, column+1, 'Cateogry', cell_text_format)
+        worksheet.write(row, column+2, 'Item Code', cell_text_format)
+        worksheet.write(row, column+3, 'Item Description', cell_text_format)
+        worksheet.write(row, column+4, 'On Hand', cell_number_format)
+        worksheet.write(row, column+5, 'Avg Cost', cell_number_format)
+        worksheet.write(row, column+6, 'Asset Value', cell_number_format)
+        worksheet.write(row, column+7, 'Sales Price', cell_number_format)
+        worksheet.write(row, column+8, 'Retail Value', cell_number_format)
 
         # data
         tot_qty = 0
         tot_asset_value = 0
         tot_retail_value = 0
 
-        for line in lines:
+        for category in lines(self.date, self.categ_id.id, self.product_id.id, self.company_id.id, 'category'):
             row += 1
             column = -1
-
-            tot_qty += line['on_hand']
-            tot_asset_value += line['product_value']
-            retail_value = line['product_price'] * line['on_hand']
-            tot_retail_value += retail_value
-
-            worksheet.write(row, column+1, line['default_code'])
-            worksheet.write(row, column+2, line['product_name'])
-            worksheet.write(row, column+3, line['on_hand'], align_right)
             worksheet.write(
-                row, column+4, get_avg_cost(line['product_id']), align_right)
-            worksheet.write(row, column+5, line['product_value'], align_right)
-            worksheet.write(row, column+6, line['product_price'], align_right)
-            worksheet.write(row, column+7, retail_value, align_right)
+                row, column+1, category['categ_name'], cell_text_format)
+
+            tot_qty_category = 0
+            tot_asset_value_category = 0
+            tot_retail_value_category = 0
+
+            for line in lines(self.date, self.categ_id.id, self.product_id.id, self.company_id.id, 'category'):
+
+                tot_qty += line['on_hand']
+                tot_asset_value += line['product_value']
+                retail_value = line['product_price'] * line['on_hand']
+                tot_retail_value += retail_value
+
+                tot_qty_category += line['on_hand']
+                tot_asset_value_category += line['product_value']
+                tot_retail_value_category += retail_value
+
+                worksheet.write(row, column+2, line['default_code'])
+                worksheet.write(row, column+3, line['product_name'])
+                worksheet.write(
+                    row, column+4, '{:,.2f}'.format(line['on_hand']), align_right)
+                worksheet.write(
+                    row, column+5, get_avg_cost(line['product_id']), align_right)
+                worksheet.write(
+                    row, column+6, '{:,.2f}'.format(line['product_value']), align_right)
+                worksheet.write(
+                    row, column+7, '{:,.2f}'.format(line['product_price']), align_right)
+                worksheet.write(
+                    row, column+8, '{:,.2f}'.format(retail_value), align_right)
+
+            row += 1
+            column = -1
+            worksheet.write(
+                row, column+4, '{:,.2f}'.format(tot_qty_category), cell_number_format)
+            worksheet.write(
+                row, column+6, '{:,.2f}'.format(tot_asset_value_category), cell_number_format)
+            worksheet.write(
+                row, column+7, '{:,.2f}'.format(tot_retail_value_category), cell_number_format)
+
+        row += 2
+        column = -1
+        worksheet.write(
+            row, column+4, '{:,.2f}'.format(tot_qty), cell_number_format)
+        worksheet.write(
+            row, column+6, '{:,.2f}'.format(tot_asset_value), cell_number_format)
+        worksheet.write(
+            row, column+7, '{:,.2f}'.format(tot_retail_value), cell_number_format)
 
         # data totals
         row += 1
