@@ -153,7 +153,7 @@ class ValuationSummaryReport(models.AbstractModel):
     _description = 'Valuation Summary Report'
 
     @api.model
-    def _lines(self, date, categ_id, product_id, company_id):
+    def _lines(self, date, categ_id, product_id, company_id, group_by):
         params = []
         select_query = """
         select pc.name as categ_name, pc.id as categ_id, sum(svl.value) as categ_value, sum(svl.quantity) as categ_on_hand
