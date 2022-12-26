@@ -223,7 +223,7 @@ class AccountStatement(models.TransientModel):
             row, column+9, "{:,}".format(total_debit_all-total_credit_all), align_right_total)
 
         workbook.close()
-        out = base64.decodebytes(fp.getvalue())
+        out = base64.encodebytes(fp.getvalue())
         self.write({'datas': out, 'datas_fname': filename})
         fp.close()
         filename += '%2Exlsx'
