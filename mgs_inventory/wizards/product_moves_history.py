@@ -1,5 +1,8 @@
 from odoo import models, fields, api
 from datetime import datetime, timedelta, date
+import xlsxwriter
+import base64
+from io import BytesIO
 
 
 class ProductMovesHistory(models.TransientModel):
@@ -21,11 +24,8 @@ class ProductMovesHistory(models.TransientModel):
         default=False, string="Show Reserved Only")
     order_id = fields.Many2one('sale.order', string="Order")
     warehouse_id = fields.Many2one('stock.warehouse', string="Warehouse")
-    # company_branch_id = fields.Many2one(
-    #     'res.company.branch',
-    #     string="Branch",
-    #     copy=False
-    # )
+    datas = fields.Binary('File', readonly=True)
+    datas_fname = fields.Char('Filename', readonly=True)
 
     @api.onchange('warehouse_id')
     def onchange_source_warehouse(self):
@@ -60,6 +60,249 @@ class ProductMovesHistory(models.TransientModel):
         }
 
         return self.env.ref('mgs_inventory.action_report_product_moves').report_action(self, data=data)
+
+    def export_to_excel(self):
+        pr_moves_history_report_obj = self.env['report.mgs_inventory.pr_moves_history_report']
+        lines = pr_moves_history_report_obj._lines
+        get_item_avg_cost = pr_moves_history_report_obj._get_item_avg_cost
+        open_balance = pr_moves_history_report_obj._sum_open_balance
+        fp = BytesIO()
+        workbook = xlsxwriter.Workbook(fp)
+        # wbf, workbook = self.add_workbook_format(workbook)
+        filename = 'ProductMovesHistoryReport'
+        worksheet = workbook.add_worksheet(filename)
+        # Formats
+        heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 14})
+        sub_heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 12})
+        date_heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 12, 'num_format': 'd-m-yyyy'})
+        date_format = workbook.add_format({'num_format': 'd-m-yyyy'})
+        cell_text_format = workbook.add_format(
+            {'align': 'left', 'bold': True, 'size': 12})
+        cell_number_format = workbook.add_format(
+            {'align': 'right', 'bold': True, 'size': 12})
+        align_right = workbook.add_format({'align': 'right'})
+        align_right_total = workbook.add_format(
+            {'align': 'right', 'bold': True})
+
+        # Heading
+        row = 1
+        worksheet.merge_range(
+            'A1:I1', self.company_id.name, sub_heading_format)
+        row += 1
+        worksheet.merge_range(
+            'A2:I3', 'Product Moves History', heading_format)
+
+        row += 1
+        column = -1
+        if self.date_from:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'From', date_heading_format)
+            worksheet.write(row, column+2, self.date_from or '', date_format)
+
+        if self.date_to:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'To', date_heading_format)
+            worksheet.write(row, column+2, self.date_to or '', date_format)
+
+        if self.product_id:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Product', cell_text_format)
+            worksheet.write(row, column+2, self.product_id.name or '')
+
+        if self.partner_id:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Partner', cell_text_format)
+            worksheet.write(row, column+2, self.partner_id.name or '')
+
+        if self.order_id:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Order', cell_text_format)
+            worksheet.write(row, column+2, self.order_id.name or '')
+
+        # Sub headers
+        row += 1
+        column = -1
+        worksheet.write(row, column+1, 'Product', cell_text_format)
+        worksheet.write(row, column+2, 'Date', cell_text_format)
+        worksheet.write(row, column+3, 'From > To', cell_text_format)
+        worksheet.write(row, column+4, 'Source', cell_text_format)
+        worksheet.write(row, column+5, 'Partner', cell_text_format)
+        worksheet.write(row, column+6, 'Qty in', cell_number_format)
+        worksheet.write(row, column+7, 'Qty out', cell_number_format)
+
+        if self.include_reserved:
+            worksheet.write(row, column+8, 'Reserved', cell_number_format)
+            if self.env.user.has_group('account.group_account_manager'):
+                worksheet.write(row, column+9, 'U.Cost', cell_number_format)
+                worksheet.write(row, column+10, 'Balance', cell_number_format)
+            else:
+                worksheet.write(row, column+9, 'Balance', cell_number_format)
+        else:
+            if self.env.user.has_group('account.group_account_manager'):
+                worksheet.write(row, column+8, 'U.Cost', cell_number_format)
+                worksheet.write(row, column+9, 'Balance', cell_number_format)
+            else:
+                worksheet.write(row, column+8, 'Balance', cell_number_format)
+
+        for main in lines(self.product_id.id, self.date_from, self.date_to, self.stock_location_ids.ids, self.partner_id.id, self.include_reserved, self.show_reserved_only, self.order_id.id, 'all'):
+            total_balance_all = 0
+            total_reserved_all = 0
+            for product in lines(self.product_id.id, self.date_from, self.date_to, self.stock_location_ids.ids, self.partner_id.id, self.include_reserved, self.show_reserved_only, self.order_id.id, 'yes'):
+                total_balance = 0
+                total_reserved = 0
+                balance = open_balance(
+                    product['product_id'], self.date_from, self.stock_location_ids.ids, self.partner_id.id)
+                total_qty_in = 0
+                total_qty_out = 0
+                row += 1
+                column = -1
+                worksheet.write(
+                    row, column+1, product['group'], cell_text_format)
+
+                if self.include_reserved:
+                    if self.env.user.has_group('account.group_account_manager'):
+                        worksheet.write(
+                            row, column+9, 'Qty Balance Forward', cell_text_format)
+                        worksheet.write(
+                            row, column+10, '{:,.2f}'.format(balance), cell_number_format)
+                    else:
+                        worksheet.write(
+                            row, column+8, 'Qty Balance Forward', cell_text_format)
+                        worksheet.write(
+                            row, column+9, '{:,.2f}'.format(balance), cell_number_format)
+                else:
+                    if self.env.user.has_group('account.group_account_manager'):
+                        worksheet.write(
+                            row, column+8, 'Qty Balance Forward', cell_text_format)
+                        worksheet.write(
+                            row, column+9, '{:,.2f}'.format(balance), cell_number_format)
+                    else:
+                        worksheet.write(
+                            row, column+7, 'Qty Balance Forward', cell_text_format)
+                        worksheet.write(
+                            row, column+8, '{:,.2f}'.format(balance), cell_number_format)
+
+                for line in lines(product['product_id'], self.date_from, self.date_to, self.stock_location_ids.ids, self.partner_id.id, self.include_reserved, self.show_reserved_only, self.order_id.id, 'no'):
+                    row += 1
+                    column = -1
+
+                    worksheet.write(row, column+2, line['date'], date_format)
+                    worksheet.write(row, column+3, '%s > %s' %
+                                    (line['location_id'], line['location_dest_id']))
+                    worksheet.write(row, column+4, '%s | %s' %
+                                    (line['picking_id'], line['origin']))
+                    worksheet.write(row, column+5, line['partner_id'])
+
+                    qty_in = line['qty_done'] if line['location_id_id'] not in self.stock_location_ids.ids else 0
+                    qty_out = line['qty_done'] if line['location_id_id'] in self.stock_location_ids.ids else 0
+                    worksheet.write(
+                        row, column+6, '{:,.2f}'.format(qty_in), align_right)
+                    worksheet.write(
+                        row, column+7, '{:,.2f}'.format(qty_out), align_right)
+
+                    balance += qty_in - qty_out
+                    total_qty_in + qty_in
+                    total_qty_out + qty_out
+
+                    if self.include_reserved:
+                        worksheet.write(
+                            row, column+8, '{:,.2f}'.format(line['reserved_qty']), align_right)
+                        if self.env.user.has_group('account.group_account_manager'):
+                            worksheet.write(row, column+9, '{:,.2f}'.format(
+                                get_item_avg_cost(line['picking_id'], line['product_id'])), align_right)
+                            worksheet.write(
+                                row, column+10, '{:,.2f}'.format(balance), align_right)
+                        else:
+                            worksheet.write(
+                                row, column+9, '{:,.2f}'.format(balance), align_right)
+                    else:
+                        if self.env.user.has_group('account.group_account_manager'):
+                            worksheet.write(row, column+8, '{:,.2f}'.format(
+                                get_item_avg_cost(line['picking_id'], line['product_id'])), align_right)
+                            worksheet.write(
+                                row, column+9, '{:,.2f}'.format(balance), align_right)
+                        else:
+                            worksheet.write(
+                                row, column+8, '{:,.2f}'.format(balance), align_right)
+
+                row += 1
+                column = -1
+                worksheet.write(row, column+1, 'Total ' +
+                                product['group'], cell_text_format)
+
+                worksheet.write(
+                    row, column+6, '{:,.2f}'.format(product['total_product_in']), cell_number_format)
+                worksheet.write(
+                    row, column+7, '{:,.2f}'.format(product['total_product_out']), cell_number_format)
+
+                if self.include_reserved:
+                    if self.env.user.has_group('account.group_account_manager'):
+                        worksheet.write(row, column+8, '', cell_text_format)
+                        worksheet.write(
+                            row, column+9, '{:,.2f}'.format(balance), cell_number_format)
+                    else:
+                        worksheet.write(row, column+7, '', cell_text_format)
+                        worksheet.write(
+                            row, column+8, '{:,.2f}'.format(balance), cell_number_format)
+                else:
+                    if self.env.user.has_group('account.group_account_manager'):
+                        worksheet.write(row, column+8, '', cell_text_format)
+                        worksheet.write(
+                            row, column+9, '{:,.2f}'.format(balance), cell_number_format)
+                    else:
+                        worksheet.write(row, column+7, '', cell_text_format)
+                        worksheet.write(
+                            row, column+8, '{:,.2f}'.format(balance), cell_number_format)
+
+                total_balance_all += balance
+
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Total', cell_text_format)
+
+            worksheet.write(
+                row, column+6, '{:,.2f}'.format(main['total_product_in_all']), cell_number_format)
+            worksheet.write(
+                row, column+7, '{:,.2f}'.format(main['total_product_out_all']), cell_number_format)
+
+            if self.include_reserved:
+                if self.env.user.has_group('account.group_account_manager'):
+                    worksheet.write(row, column+8, '', cell_text_format)
+                    worksheet.write(
+                        row, column+9, '{:,.2f}'.format(total_balance_all), cell_number_format)
+                else:
+                    worksheet.write(row, column+7, '', cell_text_format)
+                    worksheet.write(
+                        row, column+8, '{:,.2f}'.format(total_balance_all), cell_number_format)
+            else:
+                if self.env.user.has_group('account.group_account_manager'):
+                    worksheet.write(row, column+8, '', cell_text_format)
+                    worksheet.write(
+                        row, column+9, '{:,.2f}'.format(total_balance_all), cell_number_format)
+                else:
+                    worksheet.write(row, column+7, '', cell_text_format)
+                    worksheet.write(
+                        row, column+8, '{:,.2f}'.format(total_balance_all), cell_number_format)
+
+        workbook.close()
+        out = base64.encodestring(fp.getvalue())
+        self.write({'datas': out, 'datas_fname': filename})
+        fp.close()
+        filename += '%2Exlsx'
+
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'url': 'web/content/?model='+self._name+'&id='+str(self.id)+'&field=datas&download=true&filename='+filename,
+        }
 
 
 class ProductMovesHistoryReport(models.AbstractModel):

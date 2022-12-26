@@ -1,5 +1,8 @@
 from calendar import month
 from odoo import models, fields, api
+import xlsxwriter
+import base64
+from io import BytesIO
 
 
 class NonMovingItems(models.TransientModel):
@@ -16,6 +19,8 @@ class NonMovingItems(models.TransientModel):
         'stock.location', domain=[('usage', '=', 'internal')], required=True)
     company_id = fields.Many2one(
         'res.company', string='Company', default=lambda self: self.env.company.id, required=True)
+    datas = fields.Binary('File', readonly=True)
+    datas_fname = fields.Char('Filename', readonly=True)
 
     @api.onchange('warehouse_id')
     def onchange_source_warehouse(self):
@@ -37,6 +42,86 @@ class NonMovingItems(models.TransientModel):
         }
 
         return self.env.ref('mgs_inventory.action_report_non_moving_items').report_action(self, data=data)
+
+    def export_to_excel(self):
+        non_moving_items_report_obj = self.env['report.mgs_inventory.non_moving_items_report']
+        lines = non_moving_items_report_obj._lines
+        fp = BytesIO()
+        workbook = xlsxwriter.Workbook(fp)
+        # wbf, workbook = self.add_workbook_format(workbook)
+        filename = 'NonMovingItemsReport'
+        worksheet = workbook.add_worksheet(filename)
+        # Formats
+        heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 14})
+        sub_heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 12})
+        date_heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 12, 'num_format': 'd-m-yyyy'})
+        date_format = workbook.add_format({'num_format': 'd-m-yyyy'})
+        cell_text_format = workbook.add_format(
+            {'align': 'left', 'bold': True, 'size': 12})
+        cell_number_format = workbook.add_format(
+            {'align': 'right', 'bold': True, 'size': 12})
+        align_right = workbook.add_format({'align': 'right'})
+        align_right_total = workbook.add_format(
+            {'align': 'right', 'bold': True})
+
+        # Heading
+        row = 1
+        worksheet.merge_range(
+            'A1:B1', self.company_id.name, sub_heading_format)
+        row += 1
+        worksheet.merge_range(
+            'A2:B3', 'Non Moving Items', heading_format)
+
+        row += 1
+        column = -1
+        if self.from_date:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'From', date_heading_format)
+            worksheet.write(row, column+2, self.from_date or '', date_format)
+
+        if self.to_date:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'To', date_heading_format)
+            worksheet.write(row, column+2, self.to_date or '', date_format)
+
+        # Sub headers
+        row += 1
+        column = -1
+        worksheet.write(row, column+1, 'Product', cell_text_format)
+        worksheet.write(row, column+2, 'Available Qty', cell_number_format)
+
+        # data
+        tot_qty = 0
+        for line in lines(self.from_date, self.to_date, self.stock_location_ids.ids, self.company_id.id):
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, line['product_name'])
+            worksheet.write(
+                row, column+2, '{:,.2f}'.format(line['total_qty']), align_right)
+            tot_qty += line['total_qty']
+
+        row += 1
+        column = -1
+        worksheet.write(row, column+1, '')
+        worksheet.write(
+            row, column+2, '{:,.2f}'.format(tot_qty), align_right_total)
+
+        workbook.close()
+        out = base64.encodebytes(fp.getvalue())
+        self.write({'datas': out, 'datas_fname': filename})
+        fp.close()
+        filename += '%2Exlsx'
+
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'url': 'web/content/?model='+self._name+'&id='+str(self.id)+'&field=datas&download=true&filename='+filename,
+        }
 
 
 class NonMovingItemsReport(models.AbstractModel):

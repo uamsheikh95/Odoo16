@@ -1,7 +1,7 @@
 from odoo import models, fields, api
-# import xlsxwriter
-# import base64
-# from io import BytesIO
+import xlsxwriter
+import base64
+from io import BytesIO
 
 
 class ValuationSummary(models.TransientModel):
@@ -39,102 +39,113 @@ class ValuationSummary(models.TransientModel):
 
         return self.env.ref('mgs_inventory.action_valuation_summary').report_action(self, data=data)
 
-    # def export_to_excel(self):
-    #     valuation_report_obj = self.env['report.mgs_inventory.valuation_summary_report']
-    #     lines = valuation_report_obj._lines(self.categ_id.id, self.product_id.id, self.company_id.id)
-    #     get_avg_cost = valuation_report_obj._get_avg_cost
-    #     fp = BytesIO()
-    #     workbook = xlsxwriter.Workbook(fp)
-    #     # wbf, workbook = self.add_workbook_format(workbook)
-    #     filename = 'Report'
-    #     worksheet = workbook.add_worksheet(filename)
-    #     # Formats
-    #     heading_format = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 14})
-    #     sub_heading_format = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 12})
-    #     cell_text_format = workbook.add_format({'align': 'left', 'bold': True, 'size': 12})
-    #     cell_number_format = workbook.add_format({'align': 'right', 'bold': True, 'size': 12})
-    #     align_right = workbook.add_format({'align': 'right'})
-    #     align_right_total = workbook.add_format({'align': 'right', 'bold': True})
-    #
-    #     # Heading
-    #     row = 1
-    #     worksheet.merge_range('A1:G1', self.company_id.name, sub_heading_format)
-    #     row += 1
-    #     worksheet.merge_range('A2:G3', 'Inventory Valuation Summary', heading_format)
-    #     # Search criteria
-    #     row += 2
-    #     column = -1
-    #     if self.product_id:
-    #         row += 1
-    #         worksheet.write(row, column+1, 'Product', cell_text_format)
-    #         worksheet.write(row, column+2, self.product_id.name or '')
-    #         column+2
-    #
-    #     if self.categ_id:
-    #         worksheet.write(row, column+3, 'Category', cell_text_format)
-    #         worksheet.write(row, column+4, self.categ_id.name or '')
-    #
-    #     # if self.company_id:
-    #     #     column = 0
-    #     #     worksheet.write(row, column+1, 'Company', cell_text_format)
-    #     #     worksheet.write(row, column+2, self.company_id.name or '')
-    #
-    #     # Sub headers
-    #     row += 2
-    #     column = -1
-    #     worksheet.write(row, column+1, 'Item Code', cell_text_format)
-    #     worksheet.write(row, column+2, 'Item Description', cell_text_format)
-    #     worksheet.write(row, column+3, 'On Hand', cell_number_format)
-    #     worksheet.write(row, column+4, 'Avg Cost', cell_number_format)
-    #     worksheet.write(row, column+5, 'Asset Value', cell_number_format)
-    #     worksheet.write(row, column+6, 'Sales Price', cell_number_format)
-    #     worksheet.write(row, column+7, 'Retail Value', cell_number_format)
-    #
-    #     # data
-    #     tot_qty = 0
-    #     tot_asset_value = 0
-    #     tot_retail_value = 0
-    #
-    #     for line in lines:
-    #         row += 1
-    #         column = -1
-    #
-    #         tot_qty += line['on_hand']
-    #         tot_asset_value += line['product_value']
-    #         retail_value = line['product_price'] * line['on_hand']
-    #         tot_retail_value += retail_value
-    #
-    #         worksheet.write(row, column+1, line['default_code'])
-    #         worksheet.write(row, column+2, line['product_name'])
-    #         worksheet.write(row, column+3, line['on_hand'], align_right)
-    #         worksheet.write(row, column+4, get_avg_cost(line['product_id']), align_right)
-    #         worksheet.write(row, column+5, line['product_value'], align_right)
-    #         worksheet.write(row, column+6, line['product_price'], align_right)
-    #         worksheet.write(row, column+7, retail_value, align_right)
-    #
-    #     # data totals
-    #     row += 1
-    #     column = -1
-    #     worksheet.write(row, column+1, 'Total', cell_text_format)
-    #     worksheet.write(row, column+2, '')
-    #     worksheet.write(row, column+3, "{:,}".format(tot_qty), align_right_total)
-    #     worksheet.write(row, column+4, '', align_right)
-    #     worksheet.write(row, column+5, "{:,}".format(tot_asset_value), align_right_total)
-    #     worksheet.write(row, column+6, '', align_right)
-    #     worksheet.write(row, column+7, "{:,}".format(tot_retail_value), align_right_total)
-    #
-    #
-    #     workbook.close()
-    #     out=base64.encodestring(fp.getvalue())
-    #     self.write({'datas':out, 'datas_fname':filename})
-    #     fp.close()
-    #     filename += '%2Exlsx'
-    #
-    #     return {
-    #         'type': 'ir.actions.act_url',
-    #         'target': 'new',
-    #         'url': 'web/content/?model='+self._name+'&id='+str(self.id)+'&field=datas&download=true&filename='+filename,
-    #     }
+    def export_to_excel(self):
+        valuation_report_obj = self.env['report.mgs_inventory.valuation_summary_report']
+        lines = valuation_report_obj._lines(
+            self.categ_id.id, self.product_id.id, self.company_id.id)
+        get_avg_cost = valuation_report_obj._get_avg_cost
+        fp = BytesIO()
+        workbook = xlsxwriter.Workbook(fp)
+        # wbf, workbook = self.add_workbook_format(workbook)
+        filename = 'Report'
+        worksheet = workbook.add_worksheet(filename)
+        # Formats
+        heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 14})
+        sub_heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 12})
+        cell_text_format = workbook.add_format(
+            {'align': 'left', 'bold': True, 'size': 12})
+        cell_number_format = workbook.add_format(
+            {'align': 'right', 'bold': True, 'size': 12})
+        align_right = workbook.add_format({'align': 'right'})
+        align_right_total = workbook.add_format(
+            {'align': 'right', 'bold': True})
+
+        # Heading
+        row = 1
+        worksheet.merge_range(
+            'A1:G1', self.company_id.name, sub_heading_format)
+        row += 1
+        worksheet.merge_range(
+            'A2:G3', 'Inventory Valuation Summary', heading_format)
+        # Search criteria
+        row += 2
+        column = -1
+        if self.product_id:
+            row += 1
+            worksheet.write(row, column+1, 'Product', cell_text_format)
+            worksheet.write(row, column+2, self.product_id.name or '')
+            column+2
+
+        if self.categ_id:
+            worksheet.write(row, column+3, 'Category', cell_text_format)
+            worksheet.write(row, column+4, self.categ_id.name or '')
+
+        # if self.company_id:
+        #     column = 0
+        #     worksheet.write(row, column+1, 'Company', cell_text_format)
+        #     worksheet.write(row, column+2, self.company_id.name or '')
+
+        # Sub headers
+        row += 2
+        column = -1
+        worksheet.write(row, column+1, 'Item Code', cell_text_format)
+        worksheet.write(row, column+2, 'Item Description', cell_text_format)
+        worksheet.write(row, column+3, 'On Hand', cell_number_format)
+        worksheet.write(row, column+4, 'Avg Cost', cell_number_format)
+        worksheet.write(row, column+5, 'Asset Value', cell_number_format)
+        worksheet.write(row, column+6, 'Sales Price', cell_number_format)
+        worksheet.write(row, column+7, 'Retail Value', cell_number_format)
+
+        # data
+        tot_qty = 0
+        tot_asset_value = 0
+        tot_retail_value = 0
+
+        for line in lines:
+            row += 1
+            column = -1
+
+            tot_qty += line['on_hand']
+            tot_asset_value += line['product_value']
+            retail_value = line['product_price'] * line['on_hand']
+            tot_retail_value += retail_value
+
+            worksheet.write(row, column+1, line['default_code'])
+            worksheet.write(row, column+2, line['product_name'])
+            worksheet.write(row, column+3, line['on_hand'], align_right)
+            worksheet.write(
+                row, column+4, get_avg_cost(line['product_id']), align_right)
+            worksheet.write(row, column+5, line['product_value'], align_right)
+            worksheet.write(row, column+6, line['product_price'], align_right)
+            worksheet.write(row, column+7, retail_value, align_right)
+
+        # data totals
+        row += 1
+        column = -1
+        worksheet.write(row, column+1, 'Total', cell_text_format)
+        worksheet.write(row, column+2, '')
+        worksheet.write(
+            row, column+3, "{:,}".format(tot_qty), align_right_total)
+        worksheet.write(row, column+4, '', align_right)
+        worksheet.write(
+            row, column+5, "{:,}".format(tot_asset_value), align_right_total)
+        worksheet.write(row, column+6, '', align_right)
+        worksheet.write(
+            row, column+7, "{:,}".format(tot_retail_value), align_right_total)
+
+        workbook.close()
+        out = base64.encodebytes(fp.getvalue())
+        self.write({'datas': out, 'datas_fname': filename})
+        fp.close()
+        filename += '%2Exlsx'
+
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'url': 'web/content/?model='+self._name+'&id='+str(self.id)+'&field=datas&download=true&filename='+filename,
+        }
 
 
 class ValuationSummaryReport(models.AbstractModel):

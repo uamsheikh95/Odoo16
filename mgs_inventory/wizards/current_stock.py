@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta, date
 from odoo import models, fields, api
-# from itertools import groupby
-# import xlsxwriter
-# import base64
-# from io import BytesIO
+import xlsxwriter
+import base64
+from io import BytesIO
 
 
 class CurrentStock(models.TransientModel):
@@ -58,119 +57,133 @@ class CurrentStock(models.TransientModel):
 
         return self.env.ref('mgs_inventory.action_current_stock').report_action(self, data=data)
 
-    # def export_to_excel(self):
-    #     current_stock_report_obj = self.env['report.mgs_inventory.current_stock_report']
-    #     sum_qty = current_stock_report_obj._sum_qty
-    #     fp = BytesIO()
-    #     workbook = xlsxwriter.Workbook(fp)
-    #     # wbf, workbook = self.add_workbook_format(workbook)
-    #     filename = 'Report'
-    #     worksheet = workbook.add_worksheet(filename)
-    #     # Formats
-    #     heading_format = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 14})
-    #     sub_heading_format = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 12})
-    #     date_heading_format = workbook.add_format({'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 12, 'num_format': 'd-m-yyyy'})
-    #     cell_text_format = workbook.add_format({'align': 'left', 'bold': True, 'size': 12})
-    #     cell_number_format = workbook.add_format({'align': 'right', 'bold': True, 'size': 12})
-    #     align_right = workbook.add_format({'align': 'right'})
-    #     align_right_total = workbook.add_format({'align': 'right', 'bold': True})
-    #
-    #     # Heading
-    #     row = 1
-    #     worksheet.merge_range('A1:D1', self.company_id.name, sub_heading_format)
-    #     row += 1
-    #     worksheet.merge_range('A2:D3', 'Quantity on Hand by Location', heading_format)
-    #     row = 1
-    #     worksheet.merge_range('A4:D4', self.date, date_heading_format)
-    #
-    #     row += 1
-    #     column = 0
-    #     if self.product_id:
-    #         worksheet.write(row, column+1, 'Product', cell_text_format)
-    #         worksheet.write(row, column+2, self.product_id.name or '')
-    #
-    #     if self.categ_id:
-    #         worksheet.write(row, column+3, 'Category', cell_text_format)
-    #         worksheet.write(row, column+4, self.categ_id.name or '')
-    #
-    #     # Sub headers
-    #     row += 1
-    #     column = -1
-    #     worksheet.write(row, column+1, 'Location', cell_text_format)
-    #     worksheet.write(row, column+2, 'Item Code', cell_text_format)
-    #     worksheet.write(row, column+3, 'Item Description', cell_text_format)
-    #     worksheet.write(row, column+4, 'On Hand', cell_number_format)
-    #
-    #     # data
-    #     tot_qty_all = 0
-    #
-    #     # get locations
-    #     stock_location_ids = self.stock_location_ids.ids
-    #     if not stock_location_ids:
-    #         stock_location_ids = self.env['stock.location'].search([('usage','=','internal')])
-    #
-    #     # get products
-    #     domain = [('active', '=', True), ('type', '=', 'product')]
-    #     if self.product_id:
-    #         domain.append(('id', '=', self.product_id.id))
-    #
-    #     if self.categ_id:
-    #         domain.append(('categ_id', '=', self.categ_id.id))
-    #
-    #     product_ids = self.env['product.product'].search(domain, order="default_code asc")
-    #
-    #     for location in stock_location_ids:
-    #         tot_qty = 0
-    #         qty_by_location = sum_qty(self.date, self.categ_id.id, self.product_id.id, location.id, self.company_id.id)
-    #         if not qty_by_location:
-    #             continue
-    #
-    #         row += 1
-    #         column = -1
-    #         worksheet.write(row, column+1, location.location_id.name + '/' + location.name, cell_text_format)
-    #         worksheet.write(row, column+2, '', cell_text_format)
-    #         worksheet.write(row, column+3, '', cell_text_format)
-    #         worksheet.write(row, column+4, '', cell_number_format)
-    #
-    #         for product in product_ids:
-    #             qty = sum_qty(self.date, self.categ_id.id, product.id, location.id, self.company_id.id)
-    #             if not qty:
-    #                 continue
-    #
-    #             row += 1
-    #             column = -1
-    #             tot_qty += qty
-    #             worksheet.write(row, column+1, '')
-    #             worksheet.write(row, column+2, product.default_code)
-    #             worksheet.write(row, column+3, product.name)
-    #             worksheet.write(row, column+4, qty, align_right)
-    #
-    #         row += 1
-    #         worksheet.write(row, column+1, 'Total ' + location.location_id.name + '/' + location.name, cell_text_format)
-    #         worksheet.write(row, column+2, '')
-    #         worksheet.write(row, column+3, '')
-    #         worksheet.write(row, column+4, "{:,}".format(tot_qty), align_right_total)
-    #         tot_qty_all += tot_qty
-    #
-    #     row += 3
-    #     worksheet.write(row, column+1, 'Total', cell_text_format)
-    #     worksheet.write(row, column+2, '')
-    #     worksheet.write(row, column+3, '')
-    #     worksheet.write(row, column+4, "{:,}".format(tot_qty_all), align_right_total)
-    #
-    #
-    #
-    #     workbook.close()
-    #     out=base64.encodestring(fp.getvalue())
-    #     self.write({'datas':out, 'datas_fname':filename})
-    #     fp.close()
-    #     filename += '%2Exlsx'
-    #
-    #     return {
-    #         'type': 'ir.actions.act_url',
-    #         'target': 'new',
-    #         'url': 'web/content/?model='+self._name+'&id='+str(self.id)+'&field=datas&download=true&filename='+filename,
-    #     }
+    def export_to_excel(self):
+        current_stock_report_obj = self.env['report.mgs_inventory.current_stock_report']
+        sum_qty = current_stock_report_obj._sum_qty
+        fp = BytesIO()
+        workbook = xlsxwriter.Workbook(fp)
+        # wbf, workbook = self.add_workbook_format(workbook)
+        filename = 'Report'
+        worksheet = workbook.add_worksheet(filename)
+        # Formats
+        heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 14})
+        sub_heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 12})
+        date_heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 12, 'num_format': 'd-m-yyyy'})
+        cell_text_format = workbook.add_format(
+            {'align': 'left', 'bold': True, 'size': 12})
+        cell_number_format = workbook.add_format(
+            {'align': 'right', 'bold': True, 'size': 12})
+        align_right = workbook.add_format({'align': 'right'})
+        align_right_total = workbook.add_format(
+            {'align': 'right', 'bold': True})
+
+        # Heading
+        row = 1
+        worksheet.merge_range(
+            'A1:D1', self.company_id.name, sub_heading_format)
+        row += 1
+        worksheet.merge_range(
+            'A2:D3', 'Quantity on Hand by Location', heading_format)
+        row = 1
+        worksheet.merge_range('A4:D4', self.date, date_heading_format)
+
+        row += 1
+        column = 0
+        if self.product_id:
+            worksheet.write(row, column+1, 'Product', cell_text_format)
+            worksheet.write(row, column+2, self.product_id.name or '')
+
+        if self.categ_id:
+            worksheet.write(row, column+3, 'Category', cell_text_format)
+            worksheet.write(row, column+4, self.categ_id.name or '')
+
+        # Sub headers
+        row += 1
+        column = -1
+        worksheet.write(row, column+1, 'Location', cell_text_format)
+        worksheet.write(row, column+2, 'Item Code', cell_text_format)
+        worksheet.write(row, column+3, 'Item Description', cell_text_format)
+        worksheet.write(row, column+4, 'On Hand', cell_number_format)
+
+        # data
+        tot_qty_all = 0
+
+        # get locations
+        stock_location_ids = self.stock_location_ids.ids
+        if not stock_location_ids:
+            stock_location_ids = self.env['stock.location'].search(
+                [('usage', '=', 'internal')])
+
+        # get products
+        domain = [('active', '=', True), ('type', '=', 'product')]
+        if self.product_id:
+            domain.append(('id', '=', self.product_id.id))
+
+        if self.categ_id:
+            domain.append(('categ_id', '=', self.categ_id.id))
+
+        product_ids = self.env['product.product'].search(
+            domain, order="default_code asc")
+
+        for location in stock_location_ids:
+            tot_qty = 0
+            qty_by_location = sum_qty(
+                self.date, self.categ_id.id, self.product_id.id, location.id, self.company_id.id)
+            if not qty_by_location:
+                continue
+
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, location.location_id.name +
+                            '/' + location.name, cell_text_format)
+            worksheet.write(row, column+2, '', cell_text_format)
+            worksheet.write(row, column+3, '', cell_text_format)
+            worksheet.write(row, column+4, '', cell_number_format)
+
+            for product in product_ids:
+                qty = sum_qty(self.date, self.categ_id.id,
+                              product.id, location.id, self.company_id.id)
+                if not qty:
+                    continue
+
+                row += 1
+                column = -1
+                tot_qty += qty
+                worksheet.write(row, column+1, '')
+                worksheet.write(row, column+2, product.default_code)
+                worksheet.write(row, column+3, product.name)
+                worksheet.write(row, column+4, qty, align_right)
+
+            row += 1
+            worksheet.write(row, column+1, 'Total ' + location.location_id.name +
+                            '/' + location.name, cell_text_format)
+            worksheet.write(row, column+2, '')
+            worksheet.write(row, column+3, '')
+            worksheet.write(
+                row, column+4, "{:,}".format(tot_qty), align_right_total)
+            tot_qty_all += tot_qty
+
+        row += 3
+        worksheet.write(row, column+1, 'Total', cell_text_format)
+        worksheet.write(row, column+2, '')
+        worksheet.write(row, column+3, '')
+        worksheet.write(
+            row, column+4, "{:,}".format(tot_qty_all), align_right_total)
+
+        workbook.close()
+        out = base64.encodebytes(fp.getvalue())
+        self.write({'datas': out, 'datas_fname': filename})
+        fp.close()
+        filename += '%2Exlsx'
+
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'url': 'web/content/?model='+self._name+'&id='+str(self.id)+'&field=datas&download=true&filename='+filename,
+        }
 
 
 class CurrentStockReport(models.AbstractModel):

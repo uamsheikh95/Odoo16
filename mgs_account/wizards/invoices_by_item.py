@@ -142,7 +142,7 @@ class InvoicesbyItem(models.TransientModel):
                     column = -1
                     row_number = 'A%s:C%s' % (row, row)
                     worksheet.merge_range(
-                        row_number, product['product_name'], cell_text_format)
+                        row_number, product['product_name']['en_US'], cell_text_format)
 
                     # ------------------------------ Lines ------------------------------
                     for line in lines(self.date_from, self.date_to, self.company_id.id, product['product_id'], 'no', self.invoices_bills):
