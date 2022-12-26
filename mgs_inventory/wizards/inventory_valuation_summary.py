@@ -125,7 +125,7 @@ class ValuationSummary(models.TransientModel):
                 tot_retail_value_category += retail_value
 
                 worksheet.write(row, column+2, line['default_code'])
-                worksheet.write(row, column+3, line['product_name'])
+                worksheet.write(row, column+3, line['product_name']['en_US'])
                 worksheet.write(
                     row, column+4, '{:,.2f}'.format(line['on_hand']), align_right)
                 worksheet.write(
