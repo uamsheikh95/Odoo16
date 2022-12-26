@@ -1,5 +1,8 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+import xlsxwriter
+import base64
+from io import BytesIO
 
 
 class MGSInvoiceDetail(models.TransientModel):
@@ -21,6 +24,8 @@ class MGSInvoiceDetail(models.TransientModel):
         'Bills', 'Bills')], string='Invoices/Bills', default='Invoices', required=True)
     report_by = fields.Selection([('Summary', 'Summary'), ('Detail', 'Detail')],
                                  string='Report Type', default='Detail', required=True)
+    datas = fields.Binary('File', readonly=True)
+    datas_fname = fields.Char('Filename', readonly=True)
 
     @api.constrains('date_from', 'date_to')
     def _check_the_date_from_and_to(self):
@@ -46,6 +51,138 @@ class MGSInvoiceDetail(models.TransientModel):
         }
 
         return self.env.ref('mgs_account.action_invoice_detail').report_action(self, data=data)
+
+    def export_to_excel(self):
+        invoice_detail_report_obj = self.env['report.mgs_account.invoice_detail_report']
+        lines = invoice_detail_report_obj._lines
+        # self, self.date_from, self.date_to, self.company_id.id, self.partner_id.id, self.user_id.id, is_group
+
+        fp = BytesIO()
+        workbook = xlsxwriter.Workbook(fp)
+        filename = 'MGSInvoiceReport'
+        worksheet = workbook.add_worksheet(filename)
+
+        heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 14})
+        sub_heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 12})
+        cell_text_format = workbook.add_format(
+            {'align': 'left', 'bold': True, 'size': 12})
+        cell_number_format = workbook.add_format(
+            {'align': 'right', 'bold': True, 'size': 12})
+        align_right = workbook.add_format({'align': 'right'})
+        align_right_total = workbook.add_format(
+            {'align': 'right', 'bold': True})
+        date_heading_format = workbook.add_format(
+            {'align': 'left', 'bold': True, 'size': 12, 'num_format': 'd-m-yyyy'})
+        date_format = workbook.add_format(
+            {'align': 'left', 'num_format': 'd-m-yyyy'})
+
+        # Heading
+        row = 1
+        worksheet.merge_range(
+            'A1:G1', self.company_id.name, sub_heading_format)
+        row += 1
+        worksheet.merge_range('A2:G3', 'MGS Invoice Report', heading_format)
+
+        # Search criteria
+        row += 2
+        column = -1
+        if self.date_from:
+            row += 1
+            worksheet.write(row, column+1, 'From Date', cell_text_format)
+            worksheet.write(row, column+2, self.date_from or '',
+                            date_heading_format)
+
+        if self.date_to:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'To Date', cell_text_format)
+            worksheet.write(row, column+2, self.date_to or '',
+                            date_heading_format)
+
+        if self.partner_id:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Partner', cell_text_format)
+            worksheet.write(row, column+2, self.partner_id.name or '')
+
+        if self.product_id:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Product', cell_text_format)
+            worksheet.write(row, column+2, self.product_id.name or '')
+
+        if self.user_id:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Salesperson', cell_text_format)
+            worksheet.write(row, column+2, self.user_id.name or '')
+
+        if self.team_id:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Salesteam', cell_text_format)
+            worksheet.write(row, column+2, self.team_id.name or '')
+
+        if self.payment_term_id:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Payment Term', cell_text_format)
+            worksheet.write(row, column+2, self.payment_term_id.name or '')
+
+        # Sub headers
+        row += 2
+        column = -1
+        worksheet.write(row, column+1, 'Date', cell_text_format)
+        worksheet.write(row, column+2, 'Number', cell_text_format)
+        worksheet.write(row, column+3, 'Partner', cell_text_format)
+        worksheet.write(row, column+4, 'Item', cell_text_format)
+        worksheet.write(row, column+5, 'Quantity', cell_number_format)
+        worksheet.write(row, column+6, 'Rate', cell_number_format)
+        worksheet.write(row, column+7, 'Amount', cell_number_format)
+
+        total_qty = 0
+        total_amount = 0
+
+        for line in lines(self.date_from, self.date_to, self.company_id.id, self.partner_id, self.product_id.id, self.team_id.id, self.user_id.id, self.payment_term_id.id, self.invoices_bills):
+            row += 2
+            column = -1
+            worksheet.write(row, column+1, line['date'], date_format)
+            worksheet.write(row, column+2, line['ref'])
+            worksheet.write(row, column+3, line['partner'])
+            worksheet.write(row, column+4, line['product'])
+            worksheet.write(
+                row, column+5, '{:,.2f}'.format(line['quantity']), align_right)
+
+            rate = line['amount_total'] / \
+                line['quantity'] if line['amount_total'] and line['quantity'] else 0
+            worksheet.write(row, column+6, '{:,.2f}'.format(rate), align_right)
+            worksheet.write(
+                row, column+7, '{:,.2f}'.format(line['amount_total']), align_right)
+
+            total_qty += line['quantity']
+            total_amount += line['amount_total']
+
+        row += 2
+        column = -1
+        worksheet.write(
+            row, column+5, '{:,.2f}'.format(total_qty), cell_number_format)
+
+        worksheet.write(
+            row, column+7, '{:,.2f}'.format(total_amount), cell_number_format)
+
+        workbook.close()
+        out = base64.encodebytes(fp.getvalue())
+        self.write({'datas': out, 'datas_fname': filename})
+        fp.close()
+        filename += '%2Exlsx'
+
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'url': 'web/content/?model='+self._name+'&id='+str(self.id)+'&field=datas&download=true&filename='+filename,
+        }
 
 
 class MGSInvoiceDetailReport(models.AbstractModel):
