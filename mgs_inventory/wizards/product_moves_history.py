@@ -156,7 +156,7 @@ class ProductMovesHistory(models.TransientModel):
                 row += 1
                 column = -1
                 worksheet.write(
-                    row, column+1, product['group'], cell_text_format)
+                    row, column+1, product['group']['en_US'], cell_text_format)
 
                 if self.include_reserved:
                     worksheet.write(
@@ -203,7 +203,7 @@ class ProductMovesHistory(models.TransientModel):
                 row += 1
                 column = -1
                 worksheet.write(row, column+1, 'Total ' +
-                                product['group'], cell_text_format)
+                                product['group']['en_US'], cell_text_format)
 
                 worksheet.write(
                     row, column+6, '{:,.2f}'.format(product['total_product_in']), cell_number_format)
