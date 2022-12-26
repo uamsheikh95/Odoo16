@@ -145,7 +145,8 @@ class GrossProfit(models.TransientModel):
             no += 1
 
             worksheet.write(row, column+1, no)
-            worksheet.write(row, column+2, line['group'])
+            group = line['group'] if self.report_by == 'Partner' else line['group']['en_US']
+            worksheet.write(row, column+2, group)
             worksheet.write(row, column+3, line['default_code'])
             worksheet.write(
                 row, column+4, '{:,.2f}'.format(line['act_revenue']), align_right)
