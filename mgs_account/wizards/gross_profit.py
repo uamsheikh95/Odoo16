@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta, date
 from odoo import models, fields, api
+import xlsxwriter
+import base64
+from io import BytesIO
 
 
 class GrossProfit(models.TransientModel):
@@ -21,6 +24,8 @@ class GrossProfit(models.TransientModel):
         [('all', 'All Entries'), ('posted', 'All Posted Entries')], string='Target Moves', default='all', required=True)
     product_type = fields.Selection([('all', 'All Products'), ('product', '	Storable Products'), (
         'service', 'Service Products')], string='Product Type', default='all', required=True)
+    datas = fields.Binary('File', readonly=True)
+    datas_fname = fields.Char('Filename', readonly=True)
 
     def check_report(self):
         data = {
@@ -39,6 +44,145 @@ class GrossProfit(models.TransientModel):
         }
 
         return self.env.ref('mgs_account.action_report_gross_profit').report_action(self, data=data)
+
+    def export_to_excel(self):
+        gross_profit_report_obj = self.env['report.mgs_account.gross_profit_report']
+        lines = gross_profit_report_obj._lines
+        # self, self.date_from, self.date_to, self.company_id.id, self.partner_id.id, self.user_id.id, is_group
+
+        fp = BytesIO()
+        workbook = xlsxwriter.Workbook(fp)
+        filename = 'GrossProfitReports'
+        worksheet = workbook.add_worksheet(filename)
+
+        heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 14})
+        sub_heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 12})
+        cell_text_format = workbook.add_format(
+            {'align': 'left', 'bold': True, 'size': 12})
+        cell_number_format = workbook.add_format(
+            {'align': 'right', 'bold': True, 'size': 12})
+        align_right = workbook.add_format({'align': 'right'})
+        align_right_total = workbook.add_format(
+            {'align': 'right', 'bold': True})
+        date_heading_format = workbook.add_format(
+            {'align': 'left', 'bold': True, 'size': 12, 'num_format': 'd-m-yyyy'})
+        date_format = workbook.add_format(
+            {'align': 'left', 'num_format': 'd-m-yyyy'})
+
+        # Heading
+        row = 1
+        worksheet.merge_range(
+            'A1:G1', self.company_id.name, sub_heading_format)
+        row += 1
+        worksheet.merge_range('A2:G3', 'Gross Profit Report', heading_format)
+
+        # Search criteria
+        row += 2
+        column = -1
+        if self.date_from:
+            row += 1
+            worksheet.write(row, column+1, 'From Date', cell_text_format)
+            worksheet.write(row, column+2, self.date_from or '',
+                            date_format)
+
+        if self.date_to:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'To Date', cell_text_format)
+            worksheet.write(row, column+2, self.date_to or '',
+                            date_format)
+
+        if self.product_id:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Product', cell_text_format)
+            worksheet.write(row, column+2, self.product_id.name or '')
+
+        if self.report_by:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Report by', cell_text_format)
+            worksheet.write(row, column+2, self.report_by or '')
+
+        if self.report_by:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Report by', cell_text_format)
+            worksheet.write(row, column+2, self.report_by or '')
+
+        if self.target_moves:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Target Moves', cell_text_format)
+            worksheet.write(row, column+2, self.target_moves or '')
+
+        if self.product_type:
+            row += 1
+            column = -1
+            worksheet.write(row, column+1, 'Product Type', cell_text_format)
+            worksheet.write(row, column+2, self.product_type or '')
+
+        # Sub headers
+        row += 2
+        column = -1
+        worksheet.write(row, column+1, 'No', cell_text_format)
+        worksheet.write(row, column+2, self.report_by, cell_text_format)
+        worksheet.write(row, column+3, 'Product Code', cell_text_format)
+        worksheet.write(row, column+4, 'Actual Revenue', cell_number_format)
+        worksheet.write(row, column+5, 'Actual Cost', cell_number_format)
+        worksheet.write(row, column+6, 'Gross Profit', cell_number_format)
+        worksheet.write(row, column+7, 'Gross Profit %', cell_number_format)
+
+        no = 0
+        total_act_cost = 0
+        total_act_revenue = 0
+
+        for line in lines(self.company_id.id, self.date_from, self.date_to, self.partner_id.id, self.product_id.id, self.target_moves, self.product_type, self.report_by):
+            row += 2
+            column = -1
+            no += 1
+
+            worksheet.write(row, column+1, no)
+            worksheet.write(row, column+2, line['group'])
+            worksheet.write(row, column+3, line['default_code'])
+            worksheet.write(
+                row, column+4, '{:,.2f}'.format(line['act_revenue']), align_right)
+            worksheet.write(
+                row, column+5, '{:,.2f}'.format(line['act_cost']), align_right)
+
+            balance = line['act_revenue']-line['act_cost']
+            balance_percentage = (
+                balance/line['act_revenue']) * 100 if line['act_revenue'] else 0
+            worksheet.write(
+                row, column+6, '{:,.2f}'.format(balance), align_right)
+            worksheet.write(
+                row, column+7, '{:,.2f}'.format(balance_percentage), align_right)
+
+            total_act_cost += line['act_cost']
+            total_act_revenue += line['act_revenue']
+
+        row += 2
+        column = -1
+        worksheet.write(
+            row, column+4, '{:,.2f}'.format(total_act_revenue), cell_number_format)
+        worksheet.write(
+            row, column+5, '{:,.2f}'.format(total_act_cost), cell_number_format)
+        worksheet.write(
+            row, column+6, '{:,.2f}'.format(total_act_revenue-total_act_cost), cell_number_format)
+
+        workbook.close()
+        out = base64.encodebytes(fp.getvalue())
+        self.write({'datas': out, 'datas_fname': filename})
+        fp.close()
+        filename += '%2Exlsx'
+
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'url': 'web/content/?model='+self._name+'&id='+str(self.id)+'&field=datas&download=true&filename='+filename,
+        }
 
 
 class GrossProfitReport(models.AbstractModel):
