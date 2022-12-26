@@ -100,7 +100,7 @@ class NonMovingItems(models.TransientModel):
         for line in lines(self.from_date, self.to_date, self.stock_location_ids.ids, self.company_id.id):
             row += 1
             column = -1
-            worksheet.write(row, column+1, line['product_name'])
+            worksheet.write(row, column+1, line['product_name']['en_US'])
             worksheet.write(
                 row, column+2, '{:,.2f}'.format(line['total_qty']), align_right)
             tot_qty += line['total_qty']
