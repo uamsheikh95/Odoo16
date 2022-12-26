@@ -240,7 +240,7 @@ class ProductMovesHistory(models.TransientModel):
                     row, column+8, '{:,.2f}'.format(total_balance_all), cell_number_format)
 
         workbook.close()
-        out = base64.encodestring(fp.getvalue())
+        out = base64.encodebytes(fp.getvalue())
         self.write({'datas': out, 'datas_fname': filename})
         fp.close()
         filename += '%2Exlsx'
