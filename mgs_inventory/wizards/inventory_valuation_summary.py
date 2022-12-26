@@ -113,7 +113,7 @@ class ValuationSummary(models.TransientModel):
             tot_asset_value_category = 0
             tot_retail_value_category = 0
 
-            for line in lines(self.date, self.categ_id.id, self.product_id.id, self.company_id.id, 'category'):
+            for line in lines(self.date, self.categ_id.id, self.product_id.id, self.company_id.id, 'product'):
 
                 tot_qty += line['on_hand']
                 tot_asset_value += line['product_value']
