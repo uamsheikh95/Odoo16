@@ -60,7 +60,9 @@
                                         <tr t-foreach="lines(company_id.id, date_from, date_to, partner_id[0], product_id[0], target_moves, product_type, report_by)" t-as="line">
                                             <t t-set="no" t-value="no+1"/>
                                             <td><span t-esc="no"/></td>
-                                            <td><span t-esc="line['group']"/></td>
+                                            <t t-set="group" t-value="line['group']"/>
+                                            <t t-if="report_by == 'Product'" t-set="group" t-value="line['group']['en_US']"/>
+                                            <td><span t-esc="group"/></td>
                                             <td><span t-esc="line['default_code']"/></td>
                                             <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['act_revenue'])"/></td>
                                             <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['act_cost'])"/></td>
