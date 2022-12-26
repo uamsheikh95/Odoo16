@@ -42,7 +42,7 @@ class ValuationSummary(models.TransientModel):
     def export_to_excel(self):
         valuation_report_obj = self.env['report.mgs_inventory.valuation_summary_report']
         lines = valuation_report_obj._lines(
-            self.date, self.categ_id.id, self.product_id.id, self.company_id.id)
+            self.date, self.categ_id.id, self.product_id.id, self.company_id.id, 'product')
         get_avg_cost = valuation_report_obj._get_avg_cost
         fp = BytesIO()
         workbook = xlsxwriter.Workbook(fp)
