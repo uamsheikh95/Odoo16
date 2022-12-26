@@ -122,7 +122,7 @@ class AccountStatement(models.TransientModel):
             worksheet.write(row, column+2, 'Date', cell_text_format)
             worksheet.write(row, column+3, 'JV#', cell_text_format)
             worksheet.write(row, column+4, 'Partner', cell_text_format)
-            worksheet.write(row, column+5, 'Label', cell_number_format)
+            worksheet.write(row, column+5, 'Label', cell_text_format)
             worksheet.write(row, column+6, 'Debit', align_right_total)
             worksheet.write(row, column+7, 'Credit', align_right_total)
             worksheet.write(row, column+8, 'Balance', align_right_total)
@@ -168,7 +168,7 @@ class AccountStatement(models.TransientModel):
                 worksheet.write(
                     row, column+1, account['group'], cell_text_format)
                 worksheet.write(
-                    row, column+9, "{:,}".format(initial_balance), align_right_total)
+                    row, column+8, "{:,}".format(initial_balance), align_right_total)
 
                 # ------------------------------ Lines ------------------------------
                 for line in lines(self.company_id.id, self.date_from, self.date_to, account['account_id'], self.partner_id.id, self.analytic_account_id.id, self.target_moves, 'no'):
@@ -188,17 +188,6 @@ class AccountStatement(models.TransientModel):
                     worksheet.write(
                         row, column+8, "{:,}".format(balance), align_right)
 
-                    if self.env.user.has_group('analytic.group_analytic_accounting'):
-                        worksheet.write(
-                            row, column+5, line['analytic_account_name'])
-                        worksheet.write(row, column+6, line['label'])
-                        worksheet.write(
-                            row, column+7, "{:,}".format(line['debit']), align_right)
-                        worksheet.write(
-                            row, column+8, "{:,}".format(line['credit']), align_right)
-                        worksheet.write(
-                            row, column+9, "{:,}".format(balance), align_right)
-
                     # ---------------------------------------- END LINES ----------------------------------------
 
                 row += 1
@@ -206,11 +195,11 @@ class AccountStatement(models.TransientModel):
                 worksheet.write(row, column+1, 'TOTAL ' +
                                 account['group'], cell_text_format)
                 worksheet.write(
-                    row, column+7, "{:,}".format(account['total_debit']), align_right_total)
+                    row, column+6, "{:,}".format(account['total_debit']), align_right_total)
                 worksheet.write(
-                    row, column+8, "{:,}".format(account['total_credit']), align_right_total)
+                    row, column+7, "{:,}".format(account['total_credit']), align_right_total)
                 worksheet.write(
-                    row, column+9, "{:,}".format(total_balance), align_right_total)
+                    row, column+8, "{:,}".format(total_balance), align_right_total)
 
         row += 1
         column = -1
