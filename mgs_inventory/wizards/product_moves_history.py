@@ -64,7 +64,6 @@ class ProductMovesHistory(models.TransientModel):
     def export_to_excel(self):
         pr_moves_history_report_obj = self.env['report.mgs_inventory.pr_moves_history_report']
         lines = pr_moves_history_report_obj._lines
-        get_item_avg_cost = pr_moves_history_report_obj._get_item_avg_cost
         open_balance = pr_moves_history_report_obj._sum_open_balance
         fp = BytesIO()
         workbook = xlsxwriter.Workbook(fp)
@@ -140,17 +139,9 @@ class ProductMovesHistory(models.TransientModel):
 
         if self.include_reserved:
             worksheet.write(row, column+8, 'Reserved', cell_number_format)
-            if self.env.user.has_group('account.group_account_manager'):
-                worksheet.write(row, column+9, 'U.Cost', cell_number_format)
-                worksheet.write(row, column+10, 'Balance', cell_number_format)
-            else:
-                worksheet.write(row, column+9, 'Balance', cell_number_format)
+            worksheet.write(row, column+9, 'Balance', cell_number_format)
         else:
-            if self.env.user.has_group('account.group_account_manager'):
-                worksheet.write(row, column+8, 'U.Cost', cell_number_format)
-                worksheet.write(row, column+9, 'Balance', cell_number_format)
-            else:
-                worksheet.write(row, column+8, 'Balance', cell_number_format)
+            worksheet.write(row, column+8, 'Balance', cell_number_format)
 
         for main in lines(self.product_id.id, self.date_from, self.date_to, self.stock_location_ids.ids, self.partner_id.id, self.include_reserved, self.show_reserved_only, self.order_id.id, 'all'):
             total_balance_all = 0
@@ -168,27 +159,15 @@ class ProductMovesHistory(models.TransientModel):
                     row, column+1, product['group'], cell_text_format)
 
                 if self.include_reserved:
-                    if self.env.user.has_group('account.group_account_manager'):
-                        worksheet.write(
-                            row, column+9, 'Qty Balance Forward', cell_text_format)
-                        worksheet.write(
-                            row, column+10, '{:,.2f}'.format(balance), cell_number_format)
-                    else:
-                        worksheet.write(
-                            row, column+8, 'Qty Balance Forward', cell_text_format)
-                        worksheet.write(
-                            row, column+9, '{:,.2f}'.format(balance), cell_number_format)
+                    worksheet.write(
+                        row, column+8, 'Qty Balance Forward', cell_text_format)
+                    worksheet.write(
+                        row, column+9, '{:,.2f}'.format(balance), cell_number_format)
                 else:
-                    if self.env.user.has_group('account.group_account_manager'):
-                        worksheet.write(
-                            row, column+8, 'Qty Balance Forward', cell_text_format)
-                        worksheet.write(
-                            row, column+9, '{:,.2f}'.format(balance), cell_number_format)
-                    else:
-                        worksheet.write(
-                            row, column+7, 'Qty Balance Forward', cell_text_format)
-                        worksheet.write(
-                            row, column+8, '{:,.2f}'.format(balance), cell_number_format)
+                    worksheet.write(
+                        row, column+7, 'Qty Balance Forward', cell_text_format)
+                    worksheet.write(
+                        row, column+8, '{:,.2f}'.format(balance), cell_number_format)
 
                 for line in lines(product['product_id'], self.date_from, self.date_to, self.stock_location_ids.ids, self.partner_id.id, self.include_reserved, self.show_reserved_only, self.order_id.id, 'no'):
                     row += 1
@@ -215,23 +194,11 @@ class ProductMovesHistory(models.TransientModel):
                     if self.include_reserved:
                         worksheet.write(
                             row, column+8, '{:,.2f}'.format(line['reserved_qty']), align_right)
-                        if self.env.user.has_group('account.group_account_manager'):
-                            worksheet.write(row, column+9, '{:,.2f}'.format(
-                                get_item_avg_cost(line['picking_id'], line['product_id'])), align_right)
-                            worksheet.write(
-                                row, column+10, '{:,.2f}'.format(balance), align_right)
-                        else:
-                            worksheet.write(
-                                row, column+9, '{:,.2f}'.format(balance), align_right)
+                        worksheet.write(
+                            row, column+9, '{:,.2f}'.format(balance), align_right)
                     else:
-                        if self.env.user.has_group('account.group_account_manager'):
-                            worksheet.write(row, column+8, '{:,.2f}'.format(
-                                get_item_avg_cost(line['picking_id'], line['product_id'])), align_right)
-                            worksheet.write(
-                                row, column+9, '{:,.2f}'.format(balance), align_right)
-                        else:
-                            worksheet.write(
-                                row, column+8, '{:,.2f}'.format(balance), align_right)
+                        worksheet.write(
+                            row, column+8, '{:,.2f}'.format(balance), align_right)
 
                 row += 1
                 column = -1
@@ -244,23 +211,13 @@ class ProductMovesHistory(models.TransientModel):
                     row, column+7, '{:,.2f}'.format(product['total_product_out']), cell_number_format)
 
                 if self.include_reserved:
-                    if self.env.user.has_group('account.group_account_manager'):
-                        worksheet.write(row, column+8, '', cell_text_format)
-                        worksheet.write(
-                            row, column+9, '{:,.2f}'.format(balance), cell_number_format)
-                    else:
-                        worksheet.write(row, column+7, '', cell_text_format)
-                        worksheet.write(
-                            row, column+8, '{:,.2f}'.format(balance), cell_number_format)
+                    worksheet.write(row, column+7, '', cell_text_format)
+                    worksheet.write(
+                        row, column+8, '{:,.2f}'.format(balance), cell_number_format)
                 else:
-                    if self.env.user.has_group('account.group_account_manager'):
-                        worksheet.write(row, column+8, '', cell_text_format)
-                        worksheet.write(
-                            row, column+9, '{:,.2f}'.format(balance), cell_number_format)
-                    else:
-                        worksheet.write(row, column+7, '', cell_text_format)
-                        worksheet.write(
-                            row, column+8, '{:,.2f}'.format(balance), cell_number_format)
+                    worksheet.write(row, column+7, '', cell_text_format)
+                    worksheet.write(
+                        row, column+8, '{:,.2f}'.format(balance), cell_number_format)
 
                 total_balance_all += balance
 
@@ -274,23 +231,13 @@ class ProductMovesHistory(models.TransientModel):
                 row, column+7, '{:,.2f}'.format(main['total_product_out_all']), cell_number_format)
 
             if self.include_reserved:
-                if self.env.user.has_group('account.group_account_manager'):
-                    worksheet.write(row, column+8, '', cell_text_format)
-                    worksheet.write(
-                        row, column+9, '{:,.2f}'.format(total_balance_all), cell_number_format)
-                else:
-                    worksheet.write(row, column+7, '', cell_text_format)
-                    worksheet.write(
-                        row, column+8, '{:,.2f}'.format(total_balance_all), cell_number_format)
+                worksheet.write(row, column+7, '', cell_text_format)
+                worksheet.write(
+                    row, column+8, '{:,.2f}'.format(total_balance_all), cell_number_format)
             else:
-                if self.env.user.has_group('account.group_account_manager'):
-                    worksheet.write(row, column+8, '', cell_text_format)
-                    worksheet.write(
-                        row, column+9, '{:,.2f}'.format(total_balance_all), cell_number_format)
-                else:
-                    worksheet.write(row, column+7, '', cell_text_format)
-                    worksheet.write(
-                        row, column+8, '{:,.2f}'.format(total_balance_all), cell_number_format)
+                worksheet.write(row, column+7, '', cell_text_format)
+                worksheet.write(
+                    row, column+8, '{:,.2f}'.format(total_balance_all), cell_number_format)
 
         workbook.close()
         out = base64.encodestring(fp.getvalue())
