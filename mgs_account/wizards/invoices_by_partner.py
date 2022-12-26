@@ -152,7 +152,8 @@ class InvoicesbyPartner(models.TransientModel):
                         worksheet.write(
                             row, column+2, line['date'], date_format)
                         worksheet.write(row, column+3, line['ref'])
-                        worksheet.write(row, column+4, line['product'])
+                        worksheet.write(
+                            row, column+4, line['product']['en_US'])
                         worksheet.write(
                             row, column+5, "{:,}".format(line['quantity']), align_right)
                         worksheet.write(
