@@ -46,7 +46,7 @@ class ValuationSummary(models.TransientModel):
         fp = BytesIO()
         workbook = xlsxwriter.Workbook(fp)
         # wbf, workbook = self.add_workbook_format(workbook)
-        filename = 'Report'
+        filename = 'InventoryValuationSummaryReport'
         worksheet = workbook.add_worksheet(filename)
         # Formats
         heading_format = workbook.add_format(
@@ -97,6 +97,7 @@ class ValuationSummary(models.TransientModel):
         worksheet.write(row, column+6, 'Asset Value', cell_number_format)
         worksheet.write(row, column+7, 'Sales Price', cell_number_format)
         worksheet.write(row, column+8, 'Retail Value', cell_number_format)
+        worksheet.write(row, column+9, 'Margin', cell_number_format)
 
         # data
         tot_qty = 0
@@ -124,6 +125,9 @@ class ValuationSummary(models.TransientModel):
                 tot_asset_value_category += line['product_value']
                 tot_retail_value_category += retail_value
 
+                row += 1
+                column = -1
+
                 worksheet.write(row, column+2, line['default_code'])
                 worksheet.write(row, column+3, line['product_name']['en_US'])
                 worksheet.write(
@@ -136,6 +140,8 @@ class ValuationSummary(models.TransientModel):
                     row, column+7, '{:,.2f}'.format(line['product_price']), align_right)
                 worksheet.write(
                     row, column+8, '{:,.2f}'.format(retail_value), align_right)
+                worksheet.write(
+                    row, column+9, '{:,.2f}'.format(retail_value-line['product_value']), align_right)
 
             row += 1
             column = -1
@@ -144,7 +150,9 @@ class ValuationSummary(models.TransientModel):
             worksheet.write(
                 row, column+6, '{:,.2f}'.format(tot_asset_value_category), cell_number_format)
             worksheet.write(
-                row, column+7, '{:,.2f}'.format(tot_retail_value_category), cell_number_format)
+                row, column+8, '{:,.2f}'.format(tot_retail_value_category), cell_number_format)
+            worksheet.write(
+                row, column+9, '{:,.2f}'.format(tot_retail_value_category-tot_asset_value_category), cell_number_format)
 
         row += 2
         column = -1
@@ -153,7 +161,9 @@ class ValuationSummary(models.TransientModel):
         worksheet.write(
             row, column+6, '{:,.2f}'.format(tot_asset_value), cell_number_format)
         worksheet.write(
-            row, column+7, '{:,.2f}'.format(tot_retail_value), cell_number_format)
+            row, column+8, '{:,.2f}'.format(tot_retail_value), cell_number_format)
+        worksheet.write(
+            row, column+9, '{:,.2f}'.format(tot_retail_value-tot_asset_value), cell_number_format)
 
         # data totals
         row += 1
