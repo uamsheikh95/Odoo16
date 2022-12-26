@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta, date
 from odoo import models, fields, api
+import xlsxwriter
+import base64
+from io import BytesIO
 
 
 class AccountStatement(models.TransientModel):
@@ -20,6 +23,8 @@ class AccountStatement(models.TransientModel):
         [('detail', 'Detail'), ('summary', 'Summary')], string='Report Type', default='detail')
     target_moves = fields.Selection(
         [('all', 'All Entries'), ('posted', 'All Posted Entries')], string='Target Moves', default='all')
+    datas = fields.Binary('File', readonly=True)
+    datas_fname = fields.Char('Filename', readonly=True)
 
     # @api.multi
 
@@ -40,6 +45,194 @@ class AccountStatement(models.TransientModel):
         }
 
         return self.env.ref('mgs_account.action_report_account_statement').report_action(self, data=data)
+
+    def export_to_excel(self):
+        account_statement_report_obj = self.env['report.mgs_account.account_statement_report']
+        lines = account_statement_report_obj._lines
+        sum_open_balance = account_statement_report_obj._sum_open_balance
+
+        fp = BytesIO()
+        workbook = xlsxwriter.Workbook(fp)
+        filename = 'AccountStatement'
+        worksheet = workbook.add_worksheet(filename)
+
+        heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 14})
+        sub_heading_format = workbook.add_format(
+            {'align': 'center', 'valign': 'vcenter', 'bold': True, 'size': 12})
+        cell_text_format = workbook.add_format(
+            {'align': 'left', 'bold': True, 'size': 12})
+        cell_number_format = workbook.add_format(
+            {'align': 'right', 'bold': True, 'size': 12})
+        align_right = workbook.add_format({'align': 'right'})
+        align_right_total = workbook.add_format(
+            {'align': 'right', 'bold': True})
+        date_heading_format = workbook.add_format(
+            {'align': 'left', 'bold': True, 'size': 12, 'num_format': 'd-m-yyyy'})
+        date_format = workbook.add_format(
+            {'align': 'left', 'num_format': 'd-m-yyyy'})
+
+        # Heading
+        row = 1
+        worksheet.merge_range(
+            'A1:I1', self.company_id.name, sub_heading_format)
+        row += 1
+        worksheet.merge_range('A2:I3', 'Account Statement', heading_format)
+
+        # Search criteria
+        row += 2
+        column = -1
+        if self.date_from:
+            row += 1
+            worksheet.write(row, column+1, 'From Date', cell_text_format)
+            worksheet.write(row, column+2, self.date_from or '',
+                            date_heading_format)
+        column+2
+
+        if self.date_to:
+            row += 1
+            worksheet.write(row, column+1, 'To Date', cell_text_format)
+            worksheet.write(row, column+2, self.date_to or '',
+                            date_heading_format)
+        column+2
+
+        # if self.user_type_id:
+        #     row += 1
+        #     worksheet.write(row, column+1, 'Account Type', cell_text_format)
+        #     worksheet.write(row, column+2, self.user_type_id.name or '')
+        column+2
+
+        if self.target_moves:
+            row += 1
+            worksheet.write(row, column+1, 'Target Moves', cell_text_format)
+            worksheet.write(row, column+2, self.target_moves or '')
+        column+2
+
+        # Sub headers
+        row += 2
+        column = -1
+        worksheet.write(row, column+1, 'Account', cell_text_format)
+
+        worksheet.write(row, column+2, 'Initial Balance', cell_number_format)
+        worksheet.write(row, column+3, 'Debit', cell_number_format)
+        worksheet.write(row, column+4, 'Credit', cell_number_format)
+        worksheet.write(row, column+5, 'Balance', cell_number_format)
+
+        if self.report_by == 'detail':
+            worksheet.write(row, column+2, 'Date', cell_text_format)
+            worksheet.write(row, column+3, 'JV#', cell_text_format)
+            worksheet.write(row, column+4, 'Partner', cell_text_format)
+            worksheet.write(row, column+5, 'Label', cell_number_format)
+            worksheet.write(row, column+6, 'Debit', align_right_total)
+            worksheet.write(row, column+7, 'Credit', align_right_total)
+            worksheet.write(row, column+8, 'Balance', align_right_total)
+
+            if self.env.user.has_group('analytic.group_analytic_accounting'):
+                worksheet.write(
+                    row, column+5, 'Analytic Account', cell_number_format)
+                worksheet.write(row, column+6, 'Label', cell_number_format)
+                worksheet.write(row, column+7, 'Debit', align_right_total)
+                worksheet.write(row, column+8, 'Credit', align_right_total)
+                worksheet.write(row, column+9, 'Balance', align_right_total)
+
+        # ------------------------------ Account ------------------------------
+        total_debit_all = 0
+        total_credit_all = 0
+
+        for account in lines(self.company_id.id, self.date_from, self.date_to, self.account_id.id, self.partner_id.id, self.analytic_account_id.id, self.target_moves, 'yes'):
+            # Inital Balance
+            initial_balance = 0 if not self.date_from else sum_open_balance(
+                self.company_id.id, self.date_from, account['account_id'], self.analytic_account_id.id, self.partner_id.id, self.target_moves)
+            total_balance = initial_balance + \
+                (account['total_debit']-account['total_credit'])
+            balance = initial_balance
+            if self.report_by == 'summary':
+                row += 1
+                column = -1
+                worksheet.write(row, column+1, account['group'])
+                worksheet.write(
+                    row, column+2, "{:,}".format(initial_balance), align_right)
+                worksheet.write(
+                    row, column+3, "{:,}".format(account['total_debit']), align_right)
+                worksheet.write(
+                    row, column+4, "{:,}".format(account['total_credit']), align_right)
+                worksheet.write(
+                    row, column+5, "{:,}".format(total_balance), align_right)
+
+                total_debit_all += account['total_debit']
+                total_credit_all += account['total_credit']
+
+            if self.report_by == 'detail':
+                row += 2
+                column = -1
+                worksheet.write(
+                    row, column+1, account['group'], cell_text_format)
+                worksheet.write(
+                    row, column+9, "{:,}".format(initial_balance), align_right_total)
+
+                # ------------------------------ Lines ------------------------------
+                for line in lines(self.company_id.id, self.date_from, self.date_to, account['account_id'], self.partner_id.id, self.analytic_account_id.id, self.target_moves, 'no'):
+                    row += 1
+                    column = -1
+
+                    worksheet.write(row, column+1, '')
+                    worksheet.write(row, column+2, line['date'], date_format)
+                    worksheet.write(row, column+3, line['voucher_no'])
+                    worksheet.write(row, column+4, line['partner_name'])
+                    worksheet.write(row, column+5, line['label'])
+                    worksheet.write(
+                        row, column+6, "{:,}".format(line['debit']), align_right)
+                    worksheet.write(
+                        row, column+7, "{:,}".format(line['credit']), align_right)
+                    balance += line['debit'] - line['credit']
+                    worksheet.write(
+                        row, column+8, "{:,}".format(balance), align_right)
+
+                    if self.env.user.has_group('analytic.group_analytic_accounting'):
+                        worksheet.write(
+                            row, column+5, line['analytic_account_name'])
+                        worksheet.write(row, column+6, line['label'])
+                        worksheet.write(
+                            row, column+7, "{:,}".format(line['debit']), align_right)
+                        worksheet.write(
+                            row, column+8, "{:,}".format(line['credit']), align_right)
+                        worksheet.write(
+                            row, column+9, "{:,}".format(balance), align_right)
+
+                    # ---------------------------------------- END LINES ----------------------------------------
+
+                row += 1
+                column = -1
+                worksheet.write(row, column+1, 'TOTAL ' +
+                                account['group'], cell_text_format)
+                worksheet.write(
+                    row, column+7, "{:,}".format(account['total_debit']), align_right_total)
+                worksheet.write(
+                    row, column+8, "{:,}".format(account['total_credit']), align_right_total)
+                worksheet.write(
+                    row, column+9, "{:,}".format(total_balance), align_right_total)
+
+        row += 1
+        column = -1
+        worksheet.write(row, column+1, '')
+        worksheet.write(
+            row, column+7, "{:,}".format(total_debit_all), align_right_total)
+        worksheet.write(
+            row, column+8, "{:,}".format(total_credit_all), align_right_total)
+        worksheet.write(
+            row, column+9, "{:,}".format(total_debit_all-total_credit_all), align_right_total)
+
+        workbook.close()
+        out = base64.encodestring(fp.getvalue())
+        self.write({'datas': out, 'datas_fname': filename})
+        fp.close()
+        filename += '%2Exlsx'
+
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'url': 'web/content/?model='+self._name+'&id='+str(self.id)+'&field=datas&download=true&filename='+filename,
+        }
 
 
 class AccountStatementReport(models.AbstractModel):
