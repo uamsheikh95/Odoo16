@@ -42,7 +42,7 @@ class ValuationSummary(models.TransientModel):
     def export_to_excel(self):
         valuation_report_obj = self.env['report.mgs_inventory.valuation_summary_report']
         lines = valuation_report_obj._lines(
-            self.categ_id.id, self.product_id.id, self.company_id.id)
+            self.date, self.categ_id.id, self.product_id.id, self.company_id.id)
         get_avg_cost = valuation_report_obj._get_avg_cost
         fp = BytesIO()
         workbook = xlsxwriter.Workbook(fp)
@@ -153,7 +153,7 @@ class ValuationSummaryReport(models.AbstractModel):
     _description = 'Valuation Summary Report'
 
     @api.model
-    def _lines(self, date, categ_id, product_id, company_id, group_by):
+    def _lines(self, date, categ_id, product_id, company_id):
         params = []
         select_query = """
         select pc.name as categ_name, pc.id as categ_id, sum(svl.value) as categ_value, sum(svl.quantity) as categ_on_hand
