@@ -64,10 +64,10 @@ class ValuationSummary(models.TransientModel):
         # Heading
         row = 1
         worksheet.merge_range(
-            'A1:G1', self.company_id.name, sub_heading_format)
+            'A1:I1', self.company_id.name, sub_heading_format)
         row += 1
         worksheet.merge_range(
-            'A2:G3', 'Inventory Valuation Summary', heading_format)
+            'A2:I3', 'Inventory Valuation Summary', heading_format)
         # Search criteria
         row += 2
         column = -1
@@ -164,20 +164,6 @@ class ValuationSummary(models.TransientModel):
             row, column+8, '{:,.2f}'.format(tot_retail_value), cell_number_format)
         worksheet.write(
             row, column+9, '{:,.2f}'.format(tot_retail_value-tot_asset_value), cell_number_format)
-
-        # data totals
-        row += 1
-        column = -1
-        worksheet.write(row, column+1, 'Total', cell_text_format)
-        worksheet.write(row, column+2, '')
-        worksheet.write(
-            row, column+3, "{:,}".format(tot_qty), align_right_total)
-        worksheet.write(row, column+4, '', align_right)
-        worksheet.write(
-            row, column+5, "{:,}".format(tot_asset_value), align_right_total)
-        worksheet.write(row, column+6, '', align_right)
-        worksheet.write(
-            row, column+7, "{:,}".format(tot_retail_value), align_right_total)
 
         workbook.close()
         out = base64.encodebytes(fp.getvalue())
