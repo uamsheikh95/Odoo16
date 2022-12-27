@@ -56,7 +56,6 @@
                 <field name="s_country_id" options="{'no_create': True}"/>
                 <field name="s_remarks"/>
                 <field name="remmitence_move_group_by" invisible="1"/>
-                <field name="s_amount"/>
               </group>
 
               <group>
@@ -64,7 +63,6 @@
                 <field name="s_id_no"/>
                 <field name="s_city_id" options="{'no_create': True}"/>
                 <field name="s_guarantor"/>
-                <field name="s_currency_id"/>
               </group>
             </group>
 
@@ -273,6 +271,7 @@
                 <field name="s_email"/>
                 <field name="s_country_id" options="{'no_create': True}"/>
                 <field name="s_remarks"/>
+                <field name="s_amount"/>
               </group>
 
               <group>
@@ -280,6 +279,7 @@
                 <field name="s_id_no"/>
                 <field name="s_city_id" options="{'no_create': True}"/>
                 <field name="s_guarantor"/>
+                <field name="s_currency_id"/>
               </group>
             </group>
 
