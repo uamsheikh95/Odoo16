@@ -545,9 +545,9 @@ class MGSRemittanceTransactionLine(models.Model):
             [('partner_id', '=', self.destination_company_partner_id.id)])
 
         amount = self.amount
-        company_currency_id = company_id.currency_id.id
-        currency_id = self.currency_id
-        if company_currency_id != currency_id.id:
+        currency_id = company_id.currency_id.id
+        source_currency_id = self.currency_id
+        if currency_id != source_currency_id.id:
             amount = amount / currency_id.rate
 
         transaction_line_vals = {
