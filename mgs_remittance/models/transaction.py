@@ -14,7 +14,7 @@ class MGSRemittanceTransaction(models.Model):
     name = fields.Char('Name', copy=False, default='/')
     date = fields.Date('Date', default=lambda self: fields.Date.today())
     company_id = fields.Many2one('res.company', string='Source Agent',
-                                 default=lambda self: self.env.user.company_id.id, required=True)
+                                 default=lambda self: self.env.company.id.id, required=True)
 
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,
                                   default=lambda self: self.env.user.company_id.currency_id.id)
@@ -452,7 +452,7 @@ class MGSRemittanceTransactionLine(models.Model):
     amount = fields.Monetary('Amount', required=True)
 
     company_id = fields.Many2one('res.company', string='Company',
-                                 default=lambda self: self.env.user.company_id.id)
+                                 default=lambda self: self.env.company.id.id)
     currency_id = fields.Many2one('res.currency', 'Currency', domain=[(
         'active', '=', True)], default=lambda self: self.env.user.company_id.currency_id.id)
     apply_commission = fields.Boolean(string='Apply Commission', default=False)
@@ -709,7 +709,7 @@ class MGSRemittanceTransactionDetail(models.Model):
     remarks = fields.Char('Memo')
     amount = fields.Monetary('Amount', required=True)
     company_id = fields.Many2one('res.company', string='Company',
-                                 default=lambda self: self.env.user.company_id.id)
+                                 default=lambda self: self.env.company.id.id)
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,
                                   default=lambda self: self.env.user.company_id.currency_id.id)
 
