@@ -410,6 +410,23 @@ class MGSRemittanceTransactionLine(models.Model):
     s_remarks = fields.Text(string='S.Remarks')
     s_id_no = fields.Char(string="S.Identity No.")
     s_guarantor = fields.Char(string='S.Guarantor', help="Damiin")
+    s_amount = fields.Monetary(
+        'Received Amount', compute="_compute_source_amount_currency")
+    s_currency_id = fields.Many2one('res.currency', 'Received Currency', domain=[(
+        'active', '=', True)], default=lambda self: self.env.user.company_id.currency_id.id, compute="_compute_source_amount_currency")
+
+    @api.depends('related_transaction_id_no', 'is_against_transaction_line')
+    def _compute_source_amount_currency(self):
+        for r in self:
+            r.s_amount = 0
+            r.s_currency_id = False
+
+            transaction_line_obj = self.env['mgs_remittance.transaction.line']
+            domain = [('id', '=', r.related_transaction_id_no)]
+            if r.related_transaction_id_no and r.is_against_transaction_line:
+                transaction_line_id = transaction_line_obj.sudo().search(domain)
+                r.s_amount = transaction_line_id.amount
+                r.s_currency_id = transaction_line_id.currency_id.id
 
     # Beneficiary
     beneficiary_id = fields.Many2one(
@@ -436,8 +453,8 @@ class MGSRemittanceTransactionLine(models.Model):
 
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env.user.company_id.id)
-    currency_id = fields.Many2one('res.currency', 'Currency',
-                                  default=lambda self: self.env.user.company_id.currency_id.id)
+    currency_id = fields.Many2one('res.currency', 'Currency', domain=[(
+        'active', '=', True)], default=lambda self: self.env.user.company_id.currency_id.id)
     apply_commission = fields.Boolean(string='Apply Commission', default=False)
     commission_amount = fields.Monetary('Commission Amount')
     total = fields.Monetary(
@@ -526,6 +543,13 @@ class MGSRemittanceTransactionLine(models.Model):
     def prepare_against_transaction_line(self):
         company_id = self.env['res.company'].sudo().search(
             [('partner_id', '=', self.destination_company_partner_id.id)])
+
+        amount = self.amount
+        company_currency_id = company_id.currency_id.id
+        currency_id = self.currency_id
+        if company_currency_id != currency_id.id:
+            amount = amount / currency_id.rate
+
         transaction_line_vals = {
             'destination_company_partner_id': self.destination_company_partner_id.id,
             'source_company_partner_id': self.company_id.partner_id.id,
@@ -551,7 +575,7 @@ class MGSRemittanceTransactionLine(models.Model):
             'related_transaction_id_no': self.id,
             'related_transaction_id_ref': self.transaction_id.name,
             'is_against_transaction_line': True,
-            'amount': self.amount,
+            'amount': amount,
             'company_id': company_id.id,
             'currency_id': company_id.currency_id.id,
             'apply_commission': self.apply_commission,

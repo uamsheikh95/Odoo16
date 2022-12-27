@@ -56,6 +56,7 @@
                 <field name="s_country_id" options="{'no_create': True}"/>
                 <field name="s_remarks"/>
                 <field name="remmitence_move_group_by" invisible="1"/>
+                <field name="s_amount"/>
               </group>
 
               <group>
@@ -63,6 +64,7 @@
                 <field name="s_id_no"/>
                 <field name="s_city_id" options="{'no_create': True}"/>
                 <field name="s_guarantor"/>
+                <field name="s_currency_id"/>
               </group>
             </group>
 
@@ -113,9 +115,9 @@
                     <group>
                       <group string="Accounting">
                         <field name="journal_id" required="1" options="{'no_create': True}"/>
-                        <field name="amount"/>
+                        <field name="amount" string="Recceived Amount"/>
+                        <field name="currency_id" groups="base.group_multi_currency" options="{'no_create': True}" string="Recceived Currency"/>
                         <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
-                        <field name="currency_id" groups="base.group_multi_currency" options="{'no_create': True}"/>
                       </group>
 
                       <group string="Commission">
@@ -301,9 +303,9 @@
             <group>
               <group string="Accounting">
                 <field name="journal_id" options="{'no_create': True}"/>
-                <field name="amount"/>
+                <field name="amount" string="Payout Amount"/>
+                <field name="currency_id"  string="Payout Currency" groups="base.group_multi_currency" options="{'no_create': True}"/>
                 <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
-                <field name="currency_id" groups="base.group_multi_currency" options="{'no_create': True}"/>
               </group>
 
               <group string="Commission">
