@@ -37,7 +37,7 @@ class MgsRemittancePaymentsReport(models.AbstractModel):
 
         for move in move_ids:
             for move_line in move.line_ids:
-                if move_line.account_id.user_type_id.name == 'Payable' and move_line.debit > 0 and move_line.partner_id.id == partner_id:
+                if move_line.account_id.account_type == 'liability_payable' and move_line.debit > 0 and move_line.partner_id.id == partner_id:
                     payment_ids.append(move_line)
         return payment_ids
 
