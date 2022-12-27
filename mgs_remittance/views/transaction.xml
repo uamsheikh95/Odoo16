@@ -35,7 +35,7 @@
                   <field name="move_ids" invisible="1"/>
               </button>
             </div>
-            <div class="oe_title" style="float:left;width:50%;margin-top:20px">
+            <div class="oe_title">
               <h1><field name="name" string="Order#" readonly="1"/></h1>
             </div>
 
@@ -251,9 +251,10 @@
               </button>
             </div>
 
-            <div class="oe_title" style="float:left;width:50%;margin-top:20px" attrs="{'invisible': [('is_against_transaction_line', '=', False)]}">
+            <div class="oe_title" attrs="{'invisible': [('is_against_transaction_line', '=', False)]}">
               <h1><field name="related_transaction_id_no" string="Ref#" readonly="1"/></h1>
             </div>
+            
             <group>
               <group>
                 <field name="destination_company_partner_id" options="{'no_create': True, 'no_open': True}"/>
