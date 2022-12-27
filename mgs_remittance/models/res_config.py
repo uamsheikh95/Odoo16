@@ -16,7 +16,7 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     remmitence_commission_account_id = fields.Many2one(
-        'account.account', domain=[('user_type_id.name', '=', 'Income')], related="company_id.remmitence_commission_account_id", readonly=False, string='Account', config_parameter='mgs_remittance.remmitence_commission_account_id')
+        'account.account', domain=[('account_type', '=', 'Income')], related="company_id.remmitence_commission_account_id", readonly=False, string='Account', config_parameter='mgs_remittance.remmitence_commission_account_id')
     default_remmitence_move_group_by = fields.Selection(
         [('beneficiary', 'Beneficiary'), ('journal', 'Journal')], string='Group by', default='beneficiary', default_model='mgs_remittance.transaction')
 
