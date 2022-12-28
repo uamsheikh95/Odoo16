@@ -17,7 +17,7 @@ class MGSRemittanceTransaction(models.Model):
                                  default=lambda self: self.env.company.id, required=True)
 
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,
-                                  default=lambda self: self.env.user.company_id.currency_id.id)
+                                  default=lambda self: self.env.company_id.currency_id.id)
     # Remitter
     sender_id = fields.Many2one(
         'mgs_remittance.remitter', required=True, string='Sender')
@@ -413,7 +413,7 @@ class MGSRemittanceTransactionLine(models.Model):
     s_amount = fields.Monetary(
         'Received Amount', compute="_compute_source_amount_currency")
     s_currency_id = fields.Many2one('res.currency', 'Received Currency', domain=[(
-        'active', '=', True)], default=lambda self: self.env.user.company_id.currency_id.id, compute="_compute_source_amount_currency")
+        'active', '=', True)], default=lambda self: self.env.company_id.currency_id.id, compute="_compute_source_amount_currency")
 
     @api.depends('related_transaction_id_no', 'is_against_transaction_line')
     def _compute_source_amount_currency(self):
@@ -454,7 +454,7 @@ class MGSRemittanceTransactionLine(models.Model):
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env.company.id)
     currency_id = fields.Many2one('res.currency', 'Currency', domain=[(
-        'active', '=', True)], default=lambda self: self.env.user.company_id.currency_id.id)
+        'active', '=', True)], default=lambda self: self.env.company_id.currency_id.id)
     apply_commission = fields.Boolean(string='Apply Commission', default=False)
     commission_amount = fields.Monetary('Commission Amount')
     total = fields.Monetary(
@@ -711,7 +711,7 @@ class MGSRemittanceTransactionDetail(models.Model):
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env.company.id)
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,
-                                  default=lambda self: self.env.user.company_id.currency_id.id)
+                                  default=lambda self: self.env.company_id.currency_id.id)
 
     transaction_id = fields.Many2one(
         'mgs_remittance.transaction', string='Transaction', index=True)
