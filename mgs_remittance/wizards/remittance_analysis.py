@@ -19,7 +19,7 @@ class MgsRemittanceRemittanceAnalysis(models.TransientModel):
     sender_id = fields.Many2one(
         'mgs_remittance.remitter', string='Remitter')
     beneficiary_id = fields.Many2one(
-        'mgs_remittance.beneficiary', string='Beneficiary', readonly=True)
+        'mgs_remittance.beneficiary', string='Beneficiary')
 
     @api.constrains('from_date', 'to_date')
     def _check_the_from_date_and_to(self):
