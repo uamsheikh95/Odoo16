@@ -193,7 +193,7 @@ class MGSRemittanceTransaction(models.Model):
             'account_id': account_src,
             'date_maturity': account_date,
             'currency_id': currency_id,
-            'exclude_from_invoice_tab': True,
+            # 'exclude_from_invoice_tab': True,
         }
 
         move_line_values.append((0, 0, move_line_src))
@@ -255,7 +255,7 @@ class MGSRemittanceTransaction(models.Model):
                 'account_id': account_src,
                 'date_maturity': account_date,
                 'currency_id': currency_id,
-                'exclude_from_invoice_tab': True,
+                # 'exclude_from_invoice_tab': True,
             }
 
             move_line_values.append((0, 0, move_line_src))
