@@ -456,7 +456,8 @@ class MGSRemittanceTransactionLine(models.Model):
         'account.journal', string="Cash/Bank Acc", domain=[('type', 'in', ['cash', 'bank'])])
     payment_method = fields.Selection(
         [('Cash', 'Cash'), ('Balance', 'Balance')], default='Cash', required=True)
-    sender_balance = fields.Monetary('Balance', related='sender_id.debit')
+    sender_balance = fields.Monetary(
+        'Balance', related='transaction_id.sender_id.debit')
     amount = fields.Monetary('Amount', required=True)
 
     company_id = fields.Many2one('res.company', string='Company',
