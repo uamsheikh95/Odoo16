@@ -18,3 +18,17 @@ class MGSRemittanceRemitter(models.Model):
 
     transaction_line_ids = fields.One2many(
         'mgs_remittance.transaction.line', 'sender_id', string="Transaction")
+    partner_id = fields.Many2one('res.partner', ondelete='restrict', auto_join=True, index=True,
+                                 string='Related Partner', help='Partner-related data of the remitter')
+
+    @api.model
+    def create(self, vals):
+        created_partner = self.env['res.partner'].create({
+            'name': vals['name'],
+            'mobile': vals['mobile'],
+            'email': vals['email'],
+            'country_id': vals['country_id'],
+            'city': self.env['mgs_remittance.city'].search([('id', '=', vals['city_id'])]).name,
+        })
+        vals['partner_id'] = created_partner.id
+        return super(MGSRemittanceRemitter, self).create(vals)
