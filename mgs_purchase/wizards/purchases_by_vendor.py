@@ -149,13 +149,13 @@ class PurchasesbyVendorDetail(models.TransientModel):
                     column = -1
                     worksheet.write(row, column+1, partner['partner_name'])
                     worksheet.write(
-                        row, column+2, "{:,}".format(partner['total_qty_ordered']), align_right)
+                        row, column+2, int(partner['total_qty_ordered']), align_right)
                     worksheet.write(
-                        row, column+3, "{:,}".format(partner['total_qty_received']), align_right)
+                        row, column+3, int(partner['total_qty_received']), align_right)
                     worksheet.write(
-                        row, column+4, "{:,}".format(partner['total_qty_billed']), align_right)
+                        row, column+4, int(partner['total_qty_billed']), align_right)
                     worksheet.write(
-                        row, column+5, "{:,}".format(partner['total_amount']), align_right)
+                        row, column+5, int(partner['total_amount']), align_right)
 
                 if self.report_by == 'Detail':
                     row += 2
@@ -173,18 +173,19 @@ class PurchasesbyVendorDetail(models.TransientModel):
                         worksheet.write(
                             row, column+2, line['date_order'], date_format)
                         worksheet.write(row, column+3, line['order_no'])
-                        worksheet.write(row, column+4, line['product'])
                         worksheet.write(
-                            row, column+5, "{:,}".format(line['qty_ordered']), align_right)
+                            row, column+4, line['product']['en_US'])
                         worksheet.write(
-                            row, column+6, "{:,}".format(line['qty_received']), align_right)
+                            row, column+5, int(line['qty_ordered']), align_right)
                         worksheet.write(
-                            row, column+7, "{:,}".format(line['qty_billed']), align_right)
+                            row, column+6, int(line['qty_received']), align_right)
+                        worksheet.write(
+                            row, column+7, int(line['qty_billed']), align_right)
 
                         worksheet.write(
                             row, column+8, line['price_total']/line['qty_ordered'], align_right)
                         worksheet.write(
-                            row, column+9, "{:,}".format(line['price_total']), align_right)
+                            row, column+9, int(line['price_total']), align_right)
 
                         # ---------------------------------------- END LINES ----------------------------------------
 
@@ -196,14 +197,14 @@ class PurchasesbyVendorDetail(models.TransientModel):
                     worksheet.write(row, column+3, '', cell_text_format)
                     worksheet.write(row, column+4, '', cell_text_format)
                     worksheet.write(
-                        row, column+5, "{:,}".format(partner['total_qty_ordered']), align_right_total)
+                        row, column+5, int(partner['total_qty_ordered']), align_right_total)
                     worksheet.write(
-                        row, column+6, "{:,}".format(partner['total_qty_received']), align_right_total)
+                        row, column+6, int(partner['total_qty_received']), align_right_total)
                     worksheet.write(
-                        row, column+7, "{:,}".format(partner['total_qty_billed']), align_right_total)
+                        row, column+7, int(partner['total_qty_billed']), align_right_total)
                     worksheet.write(row, column+8, '')
                     worksheet.write(
-                        row, column+9, "{:,}".format(partner['total_amount']), align_right_total)
+                        row, column+9, int(partner['total_amount']), align_right_total)
 
             # Main Totals
             row += 2
@@ -211,13 +212,13 @@ class PurchasesbyVendorDetail(models.TransientModel):
             worksheet.write(row, column+1, 'Total', cell_text_format)
 
             worksheet.write(
-                row, column+2, "{:,}".format(main['total_qty_ordered_all']), align_right_total)
+                row, column+2, int(main['total_qty_ordered_all']), align_right_total)
             worksheet.write(
-                row, column+3, "{:,}".format(main['total_qty_received_all']), align_right_total)
+                row, column+3, int(main['total_qty_received_all']), align_right_total)
             worksheet.write(
-                row, column+4, "{:,}".format(main['total_qty_billed_all']), align_right_total)
+                row, column+4, int(main['total_qty_billed_all']), align_right_total)
             worksheet.write(
-                row, column+5, "{:,}".format(main['total_amount_all']), align_right_total)
+                row, column+5, int(main['total_amount_all']), align_right_total)
 
             if self.report_by == 'Detail':
                 worksheet.write(row, column+2, '', cell_text_format)
@@ -225,14 +226,14 @@ class PurchasesbyVendorDetail(models.TransientModel):
                 worksheet.write(row, column+4, '', cell_text_format)
 
                 worksheet.write(
-                    row, column+5, "{:,}".format(main['total_qty_ordered_all']), align_right_total)
+                    row, column+5, int(main['total_qty_ordered_all']), align_right_total)
                 worksheet.write(
-                    row, column+6, "{:,}".format(main['total_qty_received_all']), align_right_total)
+                    row, column+6, int(main['total_qty_received_all']), align_right_total)
                 worksheet.write(
-                    row, column+7, "{:,}".format(main['total_qty_billed_all']), align_right_total)
+                    row, column+7, int(main['total_qty_billed_all']), align_right_total)
                 worksheet.write(row, column+8, '', cell_number_format)
                 worksheet.write(
-                    row, column+9, "{:,}".format(main['total_amount_all']), align_right_total)
+                    row, column+9, int(main['total_amount_all']), align_right_total)
 
         workbook.close()
         out = base64.encodebytes(fp.getvalue())
