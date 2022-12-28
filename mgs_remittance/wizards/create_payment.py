@@ -17,9 +17,9 @@ class MgsRemittancePaymentWizard(models.TransientModel):
         'mgs_remittance.transaction.line', string="Transaction Line", required=True)
 
     company_id = fields.Many2one('res.company', string='Company',
-                                 default=lambda self: self.env.user.company_id.id)
+                                 default=lambda self: self.env.company.id)
     currency_id = fields.Many2one('res.currency', 'Currency', required=True,
-                                  default=lambda self: self.env.user.company_id.currency_id.id)
+                                  default=lambda self: self.env.company.currency_id.id)
     total = fields.Monetary(
         'Amount')
 
