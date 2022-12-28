@@ -54,7 +54,7 @@
                                     <thead>
                                         <tr>
                                             <th nowrap="nowrap">
-                                                <span t-if="invoices_bills == 'Invoices'">Customer</span>
+                                                <span t-if="invoices_bills == 'Invoices'">Item</span>
                                                 <span t-if="invoices_bills == 'Bills'">Vendor</span>
                                             </th>
                                             <th nowrap="nowrap"><t t-if="report_by == 'Detail'">Date</t></th>
