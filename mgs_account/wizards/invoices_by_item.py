@@ -166,7 +166,7 @@ class InvoicesbyItem(models.TransientModel):
                     row += 2
                     column = -1
                     worksheet.write(row, column+1, 'TOTAL ' +
-                                    product['product_name'], cell_text_format)
+                                    product['product_name']['en_US'], cell_text_format)
                     worksheet.write(row, column+2, '')
                     worksheet.write(row, column+3, '')
                     worksheet.write(row, column+4, '')
