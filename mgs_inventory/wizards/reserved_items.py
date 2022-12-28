@@ -297,7 +297,7 @@ class MgsReserveditemsReport(models.AbstractModel):
         # """ + ','.join(map(str, stock_location_ids)) +""" ) then qty_done else -qty_done end) as Balance """
         query = """
         select
-        COALESCE(sum(sml.product_qty), 0) as result
+        COALESCE(sum(sml.reserved_qty), 0) as result 
         from stock_move_line  as sml
         left join stock_picking as sp on sml.picking_id=sp.id
         left join stock_location as sl on sml.location_id=sl.id
