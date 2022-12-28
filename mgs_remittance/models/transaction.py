@@ -548,7 +548,7 @@ class MGSRemittanceTransactionLine(models.Model):
         currency_id = company_id.currency_id
         source_currency_id = self.currency_id
         if currency_id.id != source_currency_id.id:
-            amount = amount / currency_id.rate
+            amount = amount / currency_id.inverse_rate
 
         transaction_line_vals = {
             'destination_company_partner_id': self.destination_company_partner_id.id,
