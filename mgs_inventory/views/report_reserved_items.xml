@@ -17,7 +17,8 @@
                         <div class="page">
                             <style>
                                 .table th, td {
-                                    border-top: 1px solid #7d7d7d;
+                                    border-top: 1.2px solid #7d7d7d;
+                                    border-bottom: 1.2px solid #7d7d7d;
                                 }
                             </style>
 
@@ -76,7 +77,7 @@
 
                                         <!-- Lines -->
                                         <tr class="font-bold" t-if="report_by == 'Detail'">
-                                            <td colspan="4" nowrap="nowrap"><span t-esc="group['name']"/></td>
+                                            <td colspan="4" nowrap="nowrap"><span t-esc="group['name'][1]"/></td>
                                             <td class="text-right">Initital Balance</td>
                                             <td><span t-esc="'{0:,.2f}'.format(balance)"/></td>
                                         </tr>
@@ -89,7 +90,7 @@
                                                 <td><span t-esc="line['picking_id']"/><t t-if="line['origin']"> | <span t-esc="line['origin']"/></t></td>
                                                 <td>
                                                     <span t-esc="line['partner_name']" t-if="line['partner_name'] and group_by == 'Item'"/>
-                                                    <span t-esc="line['product_name']" t-if="line['product_name'] and group_by == 'Customer'"/>
+                                                    <span t-esc="line['product_name']['en_US']" t-if="line['product_name'] and group_by == 'Customer'"/>
                                                 </td>
                                                 <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['reserved_qty'])"/></td>
                                                 <td class="text-right">
