@@ -22,7 +22,8 @@
 					</sheet>
 
 				<footer>
-					<button name="confirm" string="View" type="object" class="oe_highlight"/>
+					<button name="confirm" string="PDF" type="object" class="oe_highlight"/>
+					<button name="export_to_excel" string="EXCEL" type="object" class="oe_highlight"/>
 					<button string="Cancel" special="cancel"/>
 				</footer>
 
