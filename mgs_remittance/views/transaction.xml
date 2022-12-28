@@ -112,7 +112,9 @@
 
                     <group>
                       <group string="Accounting">
-                        <field name="journal_id" required="1" options="{'no_create': True}"/>
+                        <field name="payment_method"/>
+                        <field name="journal_id" attrs="{'invisible': [('payment_method', '!=', 'Cash')], 'required': [('payment_method', '=', 'Cash')]}" options="{'no_create': True}"/>
+                        <field name="sender_balance" attrs="{'invisible': [('payment_method', '=', 'Cash')], 'required': [('payment_method', '!=', 'Cash')]}"/>
                         <field name="amount" string="Recceived Amount"/>
                         <field name="currency_id" groups="base.group_multi_currency" options="{'no_create': True}" string="Recceived Currency"/>
                         <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"/>
