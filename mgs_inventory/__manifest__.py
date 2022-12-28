@@ -16,9 +16,11 @@
         'views/report_inventory_valuation_summary.xml',
         'views/report_product_moves_history.xml',
         'views/report_non_moving_items.xml',
+        'views/report_reserved_items.xml',
         'wizards/current_stock.xml',
         'wizards/inventory_valuation_summary.xml',
         'wizards/product_moves_history.xml',
-        'wizards/non_moving_items.xml'
+        'wizards/non_moving_items.xml',
+        'wizards/reserved_items.xml',
     ],
 }

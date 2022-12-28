@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <report
+        id="action_reserved_items_report"
+        name="mgs_inventory.reserved_items_report"
+        model="mgs_inventory.reserved_items_report"
+        string="Reseved Items"
+        report_type="qweb-html"
+        paperformat="mgs_inventory_paperformat"
+        />
+
+        <template id="reserved_items_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.internal_layout" t-lang="en_US">
+                        <div class="page">
+                            <style>
+                                .table th, td {
+                                    border-top: 1px solid #7d7d7d;
+                                }
+                            </style>
+
+                            <div class="container">
+                                <h2>Reserved by <span t-esc="group_by"/> <span t-esc="report_by"/></h2>
+
+                                <div class="row" style="margin-top: 32px !important;font-size: 1.2em; font-family: 'Lato-Reg'">
+
+                                    <div class="col-3" t-if="date_from or date_to">
+                                        <strong>Date:</strong>
+                                        <p t-esc="date_from" style="margin-bottom: 0"/>
+                                        <p t-esc="date_to"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="partner_id[0]">
+                                        <strong>Partner:</strong>
+                                        <p class="m-0" t-esc="partner_id[1]"/>
+                                    </div>
+
+                                    <div class="col-3" t-if="product_id[0]">
+                                        <strong>Product:</strong>
+                                        <p class="m-0" t-esc="product_id[1]"/>
+                                    </div>
+
+
+                                    <div class="col-3" t-if="company_id"  groups="base.group_multi_company">
+                                        <strong>Company:</strong>
+                                        <p t-esc="company_id.name"/>
+                                    </div>
+                                </div>
+
+                            <table class="table table-bordered table-sm">
+                                <thead>
+                                    <tr>
+                                        <th><span t-esc="group_by"/></th>
+                                        <th t-if="report_by == 'Detail'" nowrap="nowrap">Date</th>
+                                        <th t-if="report_by == 'Detail'">Ref#</th>
+                                        <th t-if="report_by == 'Detail'">
+                                            <t t-if="group_by == 'Customer'">Product</t>
+                                            <t t-if="group_by == 'Item'">Partner</t>
+                                        </th>
+                                        <th t-if="report_by == 'Detail'" class="text-right">Reserved</th>
+                                        <th class="text-right">Balance</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <t t-set="total_reserved_all" t-value="0"/>
+                                    <t t-set="total_balance_all" t-value="0"/>
+                                    
+                                    <t t-foreach="lines(product_id[0], date_from, date_to, stock_location_ids, partner_id[0], group_by, order_id, company_id.id)" t-as="group">
+                                        <!-- Variables -->
+                                        <t t-set="total_reserved_all" t-value="total_reserved_all+group['total_reserved']"/>
+                                        <t t-if="group_by == 'Item' and date_from" t-set="balance" t-value="open_balance(group['name'][0], date_from,stock_location_ids,partner_id[0])"/>
+                                        <t t-if="group_by == 'Customer' and date_from" t-set="balance" t-value="open_balance(product_id[0], date_from,stock_location_ids,group['name'][0])"/>
+
+                                        <!-- Lines -->
+                                        <tr class="font-bold" t-if="report_by == 'Detail'">
+                                            <td colspan="4" nowrap="nowrap"><span t-esc="group['name']"/></td>
+                                            <td class="text-right">Initital Balance</td>
+                                            <td><span t-esc="'{0:,.2f}'.format(balance)"/></td>
+                                        </tr>
+
+                                        <t t-foreach="group['lines']" t-as="line">
+                                            <t t-set="balance" t-value="balance + line['reserved_qty']"/>
+                                            <tr t-if="report_by == 'Detail'">
+                                                <td/>
+                                                <td nowrap="nowrap"><span t-esc="line['date']"/></td>
+                                                <td><span t-esc="line['picking_id']"/><t t-if="line['origin']"> | <span t-esc="line['origin']"/></t></td>
+                                                <td>
+                                                    <span t-esc="line['partner_name']" t-if="line['partner_name'] and group_by == 'Item'"/>
+                                                    <span t-esc="line['product_name']" t-if="line['product_name'] and group_by == 'Customer'"/>
+                                                </td>
+                                                <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['reserved_qty'])"/></td>
+                                                <td class="text-right">
+                                                    <span t-esc="'{0:,.2f}'.format(balance)" />
+                                                </td>
+                                            </tr>
+                                        </t>
+
+                                       <tr class="font-bold">
+                                            <td nowrap="nowrap"><t t-if="report_by == 'Detail'">Total </t><span t-esc="group['name'][1]"/></td>
+                                            <th t-if="report_by == 'Detail'"></th>
+                                            <td t-if="report_by == 'Detail'"></td>
+                                            <td t-if="report_by == 'Detail'"></td>
+                                            <td t-if="report_by == 'Detail'"></td>
+                                            <td class="text-right">
+                                                <span t-esc="'{0:,.2f}'.format(balance)"/>
+                                                <t t-set="total_balance_all" t-value="total_balance_all+balance"/>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Seperator -->
+                                        <tr t-if="report_by == 'Detail'"> <td colspan="100"></td></tr>
+                                    </t>
+
+                                    <tr class="font-bold">
+                                        <!-- <td colspan="5" nowrap="nowrap">Total</td>
+                                        <td class="text-right">
+                                            <span t-esc="'{0:,.2f}'.format(total_balance_all)"/>
+                                        </td> -->
+                                        <td nowrap="nowrap">Total</td>
+                                        <td t-if="report_by == 'Detail'"></td>
+                                        <td t-if="report_by == 'Detail'"></td>
+                                        <td t-if="report_by == 'Detail'" nowrap="nowrap"></td>
+                                        <td t-if="report_by == 'Detail'"></td>
+                                        <td class="text-right">
+                                            <span t-esc="'{0:,.2f}'.format(total_balance_all)"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div> <!--container-->
+                    </div> <!--page-->
+                </t> <!--web.external_layout-->
+            </t>
+        </t> <!--web.html_container-->
+    </template>
+</odoo>
