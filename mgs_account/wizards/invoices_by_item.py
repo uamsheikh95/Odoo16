@@ -133,9 +133,9 @@ class InvoicesbyItem(models.TransientModel):
                     worksheet.write(
                         row, column+1, product['product_name']['en_US'])
                     worksheet.write(
-                        row, column+2, "{:,}".format(product['total_qty']), align_right)
+                        row, column+2, int(product['total_qty']), align_right)
                     worksheet.write(
-                        row, column+3, "{:,}".format(product['total_amount']), align_right)
+                        row, column+3, int(product['total_amount']), align_right)
 
                 if self.report_by == 'Detail':
                     row += 2
@@ -155,11 +155,11 @@ class InvoicesbyItem(models.TransientModel):
                         worksheet.write(row, column+3, line['ref'])
                         worksheet.write(row, column+4, line['partner'])
                         worksheet.write(
-                            row, column+5, "{:,}".format(line['quantity']), align_right)
+                            row, column+5, int(line['quantity']), align_right)
                         worksheet.write(
                             row, column+6, line['amount_total']/line['quantity'], align_right)
                         worksheet.write(
-                            row, column+7, "{:,}".format(line['amount_total']), align_right)
+                            row, column+7, int(line['amount_total']), align_right)
 
                         # ---------------------------------------- END LINES ----------------------------------------
 
@@ -171,10 +171,10 @@ class InvoicesbyItem(models.TransientModel):
                     worksheet.write(row, column+3, '')
                     worksheet.write(row, column+4, '')
                     worksheet.write(
-                        row, column+5, "{:,}".format(product['total_qty']), align_right_total)
+                        row, column+5, int(product['total_qty']), align_right_total)
                     worksheet.write(row, column+6, '')
                     worksheet.write(
-                        row, column+7, "{:,}".format(product['total_amount']), align_right_total)
+                        row, column+7, int(product['total_amount']), align_right_total)
 
             # Main Totals
             row += 2
@@ -182,9 +182,9 @@ class InvoicesbyItem(models.TransientModel):
             worksheet.write(row, column+1, 'Total', cell_text_format)
 
             worksheet.write(
-                row, column+2, "{:,}".format(main['total_qty_all']), align_right_total)
+                row, column+2, int(main['total_qty_all']), align_right_total)
             worksheet.write(
-                row, column+3, "{:,}".format(main['total_amount_all']), align_right_total)
+                row, column+3, int(main['total_amount_all']), align_right_total)
 
             if self.report_by == 'Detail':
                 worksheet.write(row, column+2, '', cell_text_format)
@@ -192,10 +192,10 @@ class InvoicesbyItem(models.TransientModel):
                 worksheet.write(row, column+4, '', cell_text_format)
 
                 worksheet.write(
-                    row, column+5, "{:,}".format(main['total_qty_all']), align_right_total)
+                    row, column+5, int(main['total_qty_all']), align_right_total)
                 worksheet.write(row, column+6, '', align_right_total)
                 worksheet.write(
-                    row, column+7, "{:,}".format(main['total_amount_all']), align_right_total)
+                    row, column+7, int(main['total_amount_all']), align_right_total)
 
         workbook.close()
         out = base64.encodebytes(fp.getvalue())
