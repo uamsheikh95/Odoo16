@@ -198,7 +198,7 @@ class MGSRemittanceTransaction(models.Model):
 
         if transaction.payment_method == 'Balance':
             move_line_src['partner_id'] = transaction.transaction_id.sender_id.id
-            move_line_src['debit'] = transaction.transaction_id.sender_id.debit
+            move_line_src['debit'] = transaction.transaction_id.sender_id.partner_id.debit
             move_line_src['account_id'] = transaction.transaction_id.sender_id.property_account_payable_id.id
 
         move_line_values.append((0, 0, move_line_src))
@@ -457,7 +457,7 @@ class MGSRemittanceTransactionLine(models.Model):
     payment_method = fields.Selection(
         [('Cash', 'Cash'), ('Balance', 'Balance')], default='Cash', required=True)
     sender_balance = fields.Monetary(
-        'Balance', related='transaction_id.sender_id.debit')
+        'Balance', related='transaction_id.sender_id.partner_id.debit')
     amount = fields.Monetary('Amount', required=True)
 
     company_id = fields.Many2one('res.company', string='Company',
