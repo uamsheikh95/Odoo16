@@ -198,7 +198,7 @@ class MGSRemittanceTransaction(models.Model):
 
         if transaction.payment_method == 'Balance':
             move_line_src['partner_id'] = transaction.transaction_id.sender_id.partner_id.id
-            move_line_src['debit'] = transaction.transaction_id.sender_id.partner_id.debit
+            # move_line_src['debit'] = transaction.transaction_id.sender_id.partner_id.debit
             move_line_src['account_id'] = transaction.transaction_id.sender_id.partner_id.property_account_payable_id.id
 
         move_line_values.append((0, 0, move_line_src))
