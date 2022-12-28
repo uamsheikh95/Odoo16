@@ -197,6 +197,7 @@ class MGSRemittanceTransaction(models.Model):
         }
 
         if transaction.payment_method == 'Balance':
+            move_line_src['partner_id'] = transaction.transaction_id.sender_id.id
             move_line_src['debit'] = transaction.transaction_id.sender_id.debit
             move_line_src['account_id'] = transaction.transaction_id.sender_id.property_account_payable_id.id
 
