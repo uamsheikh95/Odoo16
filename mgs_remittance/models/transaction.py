@@ -410,7 +410,7 @@ class MGSRemittanceTransactionLine(models.Model):
     s_remarks = fields.Text(string='S.Remarks')
     s_id_no = fields.Char(string="S.Identity No.")
     s_guarantor = fields.Char(string='S.Guarantor', help="Damiin")
-    s_amount = fields.Monetary(
+    s_amount = fields.Float(
         'Received Amount', compute="_compute_source_amount_currency")
     s_currency_id = fields.Many2one('res.currency', 'Received Currency', domain=[(
         'active', '=', True)], default=lambda self: self.env.company.currency_id.id, compute="_compute_source_amount_currency")
