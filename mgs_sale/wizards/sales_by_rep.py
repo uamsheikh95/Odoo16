@@ -18,6 +18,8 @@ class SalesbyRepDetail(models.TransientModel):
     company_id = fields.Many2one(
         'res.company', string='Company', default=lambda self: self.env.user.company_id.id)
     user_id = fields.Many2one('res.users', string='Salesperson')
+    datas = fields.Binary('File', readonly=True)
+    datas_fname = fields.Char('Filename', readonly=True)
 
     @api.constrains('date_from', 'date_to')
     def _check_the_date_from_and_to(self):
