@@ -324,7 +324,7 @@ class MGSRemittanceTransaction(models.Model):
 
             for line in r.transaction_line_ids:
                 ref = 'RID: %s' % str(line.id)
-                journal_id = line.journal_id
+                journal_id = line.journal_id if line.payment_method == 'Cash' else line.company_id.remmitence_payout_journal_id
                 move_vals = r._prepare_move_values(
                     journal_id, company_id, date, ref, currency_id)
                 move_line_vals = r._prepare_move_line_values(line)
