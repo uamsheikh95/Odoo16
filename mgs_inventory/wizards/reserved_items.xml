@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+		<record id="Mgs_reserved_items_form" model="ir.ui.view">
+			<field name="name">mgs_inventory.mgs_inventory_reservedt.form</field>
+			<field name="model">mgs_inventory.reserved_items</field>
+			<field name="arch" type="xml">
+			   <form>
+					<sheet>
+						<group>
+							<group>
+								<field name="date_from" string = "From"/>
+								<field name="product_id" string="Product" options="{'no_create': True}" />
+								<field name="warehouse_id" string="Warehouse" options="{'no_create': True}" />
+								<field name="company_id" options="{'no_create': True}" groups="base.group_multi_company" />
+								<field name="report_by" widget="radio"/>
+							</group>
+							<group>
+								<field name="date_to" string="To"/>
+								<field name="partner_id" string="Partner" options="{'no_create': True}" />
+								<field name="stock_location_ids"  string="Location" options="{'no_create': True}" widget="many2many_tags"/>
+								
+								
+								<field name="order_id" />
+								<field name="group_by" widget="radio"/>
+							</group>
+						</group>
+					</sheet>
+
+				<footer>
+					<button name="confirm" string="PDF" type="object" class="oe_highlight"/>
+					<button name="export_to_excel" string="EXCEL" type="object" class="oe_highlight"/>
+					<button string="Cancel" special="cancel"/>
+				</footer>
+
+			   </form>
+			</field>
+		</record>
+
+		<record id="action_Mgs_reserved_items_report" model="ir.actions.act_window">
+			<field name="name">Generate Reserved Quanitties Report</field>
+			<field name="res_model">mgs_inventory.reserved_items</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_id" ref="Mgs_reserved_items_form"/>
+			<field name="target">new</field>
+		</record>
+
+
+	<menuitem id="menu_Mgs_reserved_items_report" name="Reserved items" parent="mgs_inventory_root" action="action_Mgs_reserved_items_report" sequence="3" />
+
+</odoo>
