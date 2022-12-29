@@ -75,10 +75,10 @@ class MgsSms(models.Model):
 
     @api.model
     def _get_mgs_sms_config_params(self):
-        username = self.env.company.username
-        passowrd = self.env.company.passowrd
-        sender = self.env.company.sender
-        private_key = self.env.company.private_key
+        username = self.env.company.mgs_username
+        passowrd = self.env.company.mgs_password
+        sender = self.env.company.mgs_sender
+        private_key = self.env.company.mgs_key
         current_date = datetime.strptime(
             str(date.today()), '%Y-%m-%d').strftime('%d/%m/%Y')
         return {'username': username, 'passowrd': passowrd, 'sender': sender, 'private_key': private_key, 'current_date': current_date}
