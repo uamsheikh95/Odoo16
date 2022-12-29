@@ -179,7 +179,7 @@ class AccountPayment(models.Model):
                     payment_number = rec.name.replace('/', '-')
 
                 msg = 'PAYMENT: Macamiil waxaad soo bixisay lacag dhan USD %s tixraac %s deynta kugu hadhay hadda waa USD %s' % (
-                    '{:,}'.format(int(rec.amount)), payment_number, '{:,}'.format(partner_balance))
+                    rec.amount, payment_number, partner_balance)
                 to = rec.partner_id.mobile or None
                 sms_record = mgs_sms_obj.create({'source_name': rec.name, 'message': msg, 'mobile': to,
                                                 'partner_id': rec.partner_id.id, 'model_id': model_obj, 'datetime': datetime.now()})
