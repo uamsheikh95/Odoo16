@@ -56,7 +56,7 @@
                                         <th>Ref#</th>
                                         <th>Partner</th>
                                         <th>Product</th>
-                                        <th class="text-right">Reserved Qutantity</th>
+                                        <thstyle="text-align: right">Reserved Qutantity</th>
                                     </tr>
                                 </thead>
 
@@ -70,16 +70,16 @@
                                         <td><span t-esc="line['picking_id']"/><t t-if="line['origin']"> | <span t-esc="line['origin']"/></t></td>
                                         <td><span t-esc="line['partner_name']"/></td>
                                         <td><span t-esc="line['product_name']['en_US']"/></td>
-                                        <td class="text-right"><span t-esc="'{0:,.2f}'.format(line['reserved_qty'])"/></td>
+                                        <tdstyle="text-align: right"><span t-esc="'{0:,.2f}'.format(line['reserved_qty'])"/></td>
                                     </tr>
 
                                     <tr class="font-bold">
                                         <!-- <td colspan="5" nowrap="nowrap">Total</td>
-                                        <td class="text-right">
+                                        <tdstyle="text-align: right">
                                             <span t-esc="'{0:,.2f}'.format(total_balance_all)"/>
                                         </td> -->
                                         <td colspan="4" nowrap="nowrap"><strong>Total</strong></td>
-                                        <td class="text-right">
+                                        <tdstyle="text-align: right">
                                             <span t-esc="'{0:,.2f}'.format(total_reserved_all)"/>
                                         </td>
                                     </tr>
