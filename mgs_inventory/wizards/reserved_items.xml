@@ -8,20 +8,16 @@
 					<sheet>
 						<group>
 							<group>
-								<field name="date_from" string = "From"/>
+								<field name="date" string = "At"/>
 								<field name="product_id" string="Product" options="{'no_create': True}" />
 								<field name="warehouse_id" string="Warehouse" options="{'no_create': True}" />
 								<field name="company_id" options="{'no_create': True}" groups="base.group_multi_company" />
-								<field name="report_by" widget="radio"/>
+								<!-- <field name="report_by" widget="radio"/> -->
 							</group>
 							<group>
-								<field name="date_to" string="To"/>
 								<field name="partner_id" string="Partner" options="{'no_create': True}" />
 								<field name="stock_location_ids"  string="Location" options="{'no_create': True}" widget="many2many_tags"/>
-								
-								
-								<field name="order_id" />
-								<field name="group_by" widget="radio"/>
+								<field name="sort_by" widget="radio"/>
 							</group>
 						</group>
 					</sheet>

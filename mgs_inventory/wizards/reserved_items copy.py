@@ -13,7 +13,7 @@ class MgsReserveditems(models.TransientModel):
     _description = 'Mgs Reserved items'
 
     stock_location_ids = fields.Many2many(
-        'stock.location', domain=[('usage', '=', 'internal')])
+        'stock.location', domain=[('usage', '=', 'internal')], required=True)
     partner_id = fields.Many2one('res.partner', string="Partner")
     product_id = fields.Many2one('product.product')
     date = fields.Date('At', default=fields.Datetime.now)
@@ -22,11 +22,10 @@ class MgsReserveditems(models.TransientModel):
 
     order_id = fields.Many2one('sale.order', string="Order")
     warehouse_id = fields.Many2one('stock.warehouse', string="Warehouse")
-    #                              string='Report by', default='Detail', required=True)
-    # group_by = fields.Selection([('Customer', 'Customer'), ('Item', 'Item')],
-    #                             string='Group by', default='Customer', required=True)
-    sort_by = fields.Selection([('Date', 'Date'), ('Partner', 'Partner'), ('Item', 'Item')],
-                               string='Sort by', default='Date', required=True)
+    report_by = fields.Selection([('Summary', 'Summary'), ('Detail', 'Detail')],
+                                 string='Report by', default='Detail', required=True)
+    group_by = fields.Selection([('Customer', 'Customer'), ('Item', 'Item')],
+                                string='Report by', default='Customer', required=True)
     datas = fields.Binary('File', readonly=True)
     datas_fname = fields.Char('Filename', readonly=True)
 
@@ -37,22 +36,17 @@ class MgsReserveditems(models.TransientModel):
                 [('location_id', 'child_of', self.warehouse_id.view_location_id.id), ('usage', '=', 'internal')])
 
     def confirm(self):
-        stock_location_ids = self.stock_location_ids.ids
-        if len(self.stock_location_ids) == 1:
-            location_obj = self.env['stock.location']
-            stock_location_ids = location_obj.search(
-                [('company_id', '=', self.env.company.id)]).ids
-
         data = {
             'ids': self.ids,
             'model': self._name,
             'form': {
                 'partner_id': [self.partner_id.id, self.partner_id.name],
                 'product_id': [self.product_id.id, self.product_id.name],
-                'stock_location_ids': stock_location_ids,
+                'stock_location_ids': self.stock_location_ids.ids,
                 'date': self.date,
                 'company_id': [self.company_id.id, self.company_id.name],
-                'sort_by': self.sort_by,
+                'report_by': self.report_by,
+                'group_by': self.group_by,
                 'order_id': self.order_id.name,
             },
         }
@@ -67,7 +61,7 @@ class MgsReserveditems(models.TransientModel):
         fp = BytesIO()
         workbook = xlsxwriter.Workbook(fp)
         # wbf, workbook = self.add_workbook_format(workbook)
-        filename = 'ReservedReport'
+        filename = 'Report'
         worksheet = workbook.add_worksheet(filename)
         # Formats
         heading_format = workbook.add_format(
@@ -91,12 +85,11 @@ class MgsReserveditems(models.TransientModel):
             'A1:F1', self.company_id.name, sub_heading_format)
         row += 1
         worksheet.merge_range(
-            'A2:F3', 'Reserved Items', heading_format)
+            'A2:F3', 'Reserved by %s %s' % (self.group_by, self.report_by), heading_format)
         row += 1
         worksheet.merge_range(
-            'A4:F4', 'At %s' % self.date, date_heading_format)
+            'A4:F4', 'At %s' % self.date)
 
-        row += 1
         if self.product_id:
             row += 1
             column = -1
@@ -109,41 +102,71 @@ class MgsReserveditems(models.TransientModel):
             worksheet.write(row, column+1, 'Partner', cell_text_format)
             worksheet.write(row, column+2, self.partner_id.name or '')
 
-        if self.sort_by:
-            row += 1
-            column = -1
-            worksheet.write(row, column+1, 'Sort by', cell_text_format)
-            worksheet.write(row, column+2, self.sort_by or '')
-
         # Sub headers
-        row += 2
+        row += 1
         column = -1
-        worksheet.write(row, column+1, 'Date', cell_text_format)
-        worksheet.write(row, column+2, 'Ref#', cell_text_format)
-        worksheet.write(row, column+3, 'Customer', cell_text_format)
-        worksheet.write(row, column+4, 'Product', cell_text_format)
-        worksheet.write(row, column+5, 'Reserved Quantity', cell_number_format)
-        # worksheet.write(row, column+6, 'Balance', cell_number_format)
+        worksheet.write(row, column+1, self.group_by, cell_text_format)
+        worksheet.write(row, column+2, 'Date', cell_text_format)
+        worksheet.write(row, column+3, 'Ref#', cell_text_format)
+        group = 'Product' if self.group_by == 'Customer' else 'Item'
+        worksheet.write(row, column+4, group, cell_text_format)
+        worksheet.write(row, column+5, 'Reserved', cell_number_format)
+        worksheet.write(row, column+6, 'Balance', cell_number_format)
 
-        total_reserved = 0
-        for line in lines(self.product_id.id, self.date, self.stock_location_ids.ids, self.partner_id.id, self.sort_by, self.order_id.name, self.company_id.id):
+        total_reserved_all = 0
+        total_balance_all = 0
+        # product_id, date_from, date_to, stock_location_ids, partner_id, group_by, order_id, company_id
+        for group in lines(self.product_id.id, self.date, self.stock_location_ids.ids, self.partner_id.id, self.group_by, self.order_id.name, self.company_id.id):
+            if self.report_by == 'Detail':
+                row += 1
+                column = -1
+                balance = 0
+                if self.group_by == 'Item' and self.date_from:
+                    balance = open_balance(
+                        group['name'][0], self.date_from, self.stock_location_ids.ids, self.partner_id.id)
+                elif self.group_by == 'Item' and self.date_from:
+                    balance = open_balance(
+                        self.product_id.id, self.date_from, self.stock_location_ids.ids, self.partner_id.id)
+
+                product_customer = group['name'][1]['en_US'] if self.group_by == 'Item' else group['name'][1]
+                worksheet.write(
+                    row, column+1, product_customer, cell_text_format)
+                worksheet.write(
+                    row, column+5, 'Initital Balance', cell_text_format)
+                worksheet.write(row, column+6, int(balance),
+                                cell_number_format)
+
+            for line in group['lines']:
+                row += 1
+                column = -1
+
+                balance += line['reserved_qty']
+
+                if self.report_by == 'Detail':
+                    worksheet.write(row, column+2, line['date'], date_format)
+                    worksheet.write(row, column+3, '%s | %s' %
+                                    (line['picking_id'], line['origin']), date_format)
+                    product_customer = line['partner_name'] if line[
+                        'partner_name'] and self.group_by == 'Customer' else line['product_name']
+                    worksheet.write(row, column+4, product_customer)
+                    worksheet.write(
+                        row, column+5, int(line['reserved_qty']), align_right)
+                    worksheet.write(row, column+6, int(balance), align_right)
+
             row += 1
             column = -1
-            worksheet.write(row, column+1, line['date'], date_format)
-            worksheet.write(row, column+2, '%s | %s' %
-                            (line['picking_id'], line['origin']))
-            worksheet.write(row, column+3, line['partner_name'])
-
-            worksheet.write(row, column+4, line['product_name']['en_US'])
-            worksheet.write(
-                row, column+5, int(line['reserved_qty']), align_right)
-
-            total_reserved += line['reserved_qty']
+            product_customer = group['name'][1] if self.group_by == 'Customer' else group['name'][1]['en_US']
+            total = '%s %s' % (
+                'Total ', product_customer) if self.report_by == 'Detail' else product_customer
+            worksheet.write(row, column+1, total, cell_text_format)
+            worksheet.write(row, column+6, int(balance), cell_number_format)
+            total_balance_all += balance
 
         row += 1
         column = -1
         worksheet.write(row, column+1, 'Total', cell_text_format)
-        worksheet.write(row, column+5, int(total_reserved), cell_number_format)
+        worksheet.write(row, column+6, int(total_balance_all),
+                        cell_number_format)
 
         workbook.close()
         out = base64.encodebytes(fp.getvalue())
@@ -162,12 +185,12 @@ class MgsReserveditemsReport(models.AbstractModel):
     _name = 'report.mgs_inventory.reserved_items_report'
     _description = 'Mgs Reserved items Report'
 
-    @ api.model
-    def _lines(self, product_id, date, stock_location_ids, partner_id, sort_by, order_id, company_id):
+    @api.model
+    def _lines(self, product_id, date, stock_location_ids, partner_id, group_by, order_id, company_id):
         lines = []
         params = []
 
-        date = str(date) + " 23:59:59"
+        t_date = str(date) + " 23:59:59"
 
         # cases_query = """
         # case
@@ -180,7 +203,7 @@ class MgsReserveditemsReport(models.AbstractModel):
         query = """
         select sml.date, sp.origin,sp.name as picking_id, sml.qty_done,sml.state as state,
         sml.reserved_qty as reserved_qty, sm.partner_id as partner_id, rp.name as partner_name,
-        sml.product_id as product_id, pt.name as product_name, sml.location_id as location_id,
+        sml.product_id as product_id, pt.name as product_name, sml.location_id as location_id, 
         sl.name as location_name, sml.location_dest_id as location_dest_id, sld.name as location_dest_name,
         sld.usage as location_usage,  sml.state, sl.usage usage, sld.usage usaged, COALESCE(sm.price_unit, 0) as price_unit
 
@@ -202,7 +225,7 @@ class MgsReserveditemsReport(models.AbstractModel):
                                                       stock_location_ids)) + """))"""
         if date:
             params.append(date)
-            query += """ and sml.date <= %s"""
+            query += """ and sml.date >= %s"""
 
         if partner_id:
             params.append(partner_id)
@@ -220,45 +243,37 @@ class MgsReserveditemsReport(models.AbstractModel):
             params.append(company_id)
             query += " and sml.company_id = %s"
 
-        if sort_by == 'Date':
-            query += "order by sml.date asc"
-        elif sort_by == 'Item':
-            query += "order by pt.name asc"
-        else:
-            query += "order by rp.name asc"
+        query += "order by date asc"
 
         self.env.cr.execute(query, tuple(params))
-        res = self.env.cr.dictfetchall()
-        return res
 
-        # key = itemgetter('product_id', 'product_name') if group_by == 'Product' else itemgetter(
-        #     'partner_id', 'partner_name')
-        # res = sorted(self.env.cr.dictfetchall(), key=key)
+        key = itemgetter('product_id', 'product_name') if group_by == 'Product' else itemgetter(
+            'partner_id', 'partner_name')
+        res = sorted(self.env.cr.dictfetchall(), key=key)
 
-        # for key, value in groupby(res, key):
-        #     # lines.append({'Name': key, 'Lines': list(value), 'Total': sum(item['Total'] for item in value)})
-        #     # print(key)
-        #     sub_lines = []
-        #     total_reserved = 0
+        for key, value in groupby(res, key):
+            # lines.append({'Name': key, 'Lines': list(value), 'Total': sum(item['Total'] for item in value)})
+            # print(key)
+            sub_lines = []
+            total_reserved = 0
 
-        #     for k in value:
-        #         sub_lines.append(k)
-        #         total_reserved += k['reserved_qty']
+            for k in value:
+                sub_lines.append(k)
+                total_reserved += k['reserved_qty']
 
-        #     lines.append({'name': key, 'lines': sub_lines,
-        #                  'total_reserved': total_reserved})
-        # return lines
+            lines.append({'name': key, 'lines': sub_lines,
+                         'total_reserved': total_reserved})
+        return lines
 
-    def _sum_open_balance(self, product_id, date, stock_location_ids, partner_id):
+    def _sum_open_balance(self, product_id, date_from, stock_location_ids, partner_id):
         params = []  # , company_branch_id
         # pre_query= """
         # select sum(case
         # when sld.id in (
         # """ + ','.join(map(str, stock_location_ids)) +""" ) then qty_done else -qty_done end) as Balance """
-        date = str(date) + " 23:59:59"
         query = """
         select
-        COALESCE(sum(sml.reserved_qty), 0) as result
+        COALESCE(sum(sml.reserved_qty), 0) as result 
         from stock_move_line  as sml
         left join stock_picking as sp on sml.picking_id=sp.id
         left join stock_location as sl on sml.location_id=sl.id
@@ -273,8 +288,8 @@ class MgsReserveditemsReport(models.AbstractModel):
                 """) or sml.location_dest_id in (""" + ','.join(
                     map(str, stock_location_ids)) + """))"""
 
-        if date:
-            params.append(date)
+        if date_from:
+            params.append(date_from)
             query += " and sml.date < %s"
 
         if product_id:
@@ -311,7 +326,7 @@ class MgsReserveditemsReport(models.AbstractModel):
             result = (value * -1) / (qty * -1) or 0
         return result
 
-    @ api.model
+    @api.model
     # def _get_report_values(self, docids, data=None):
     def _get_report_values(self, docids, data=None):
         model = self.env.context.get('active_model')
@@ -321,13 +336,15 @@ class MgsReserveditemsReport(models.AbstractModel):
             'doc_ids': self.ids,
             'doc_model': model,
             'docs': docs,
-            'date': data['form']['date'],
+            'date_from': data['form']['date_from'],
+            'date_to': data['form']['date_to'],
             'partner_id': data['form']['partner_id'],
             'product_id': data['form']['product_id'],
             'stock_location_ids': data['form']['stock_location_ids'],
             'company_id': self.env['res.company'].search([('id', '=', data['form']['company_id'][0])]),
             'order_id': data['form']['order_id'],
-            'sort_by': data['form']['sort_by'],
+            'report_by': data['form']['report_by'],
+            'group_by': data['form']['group_by'],
             'lines': self._lines,
             'open_balance': self._sum_open_balance,
             'get_item_avg_cost': self._get_item_avg_cost
