@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+
+
+access_mgs_sms,mgs_sms_integration.mgs_sms,model_mgs_sms,base.group_no_one,1,1,1,1
+create_mgs_sms,mgs_sms_integration.mgs_sms,model_mgs_sms,base.group_user,0,0,1,0
+

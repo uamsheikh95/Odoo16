@@ -1,0 +1,71 @@
+<odoo>
+
+    <data>
+
+
+        <record id="sms_settings_view" model="ir.ui.view">
+            <field name="name">MGS SMS Configuration</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="50"/>
+            <field name="inherit_id" ref="base.res_config_settings_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//div[hasclass('settings')]" position="inside">
+                    <div class="app_settings_block" data-string="MGS SMS" string="MGS SMS Config" web_icon="mgs_sms_integration,static/description/icon.png" data-key="mgs_sms_integration">
+                        <h2>SMS</h2>
+                        <div class="row mt16 o_settings_container" name="sms_config_container">
+                            <div class="col-12 col-lg-6 o_setting_box" id="sms_config">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <span class="o_form_label">SMS Gateway</span>
+                                    <span class="fa fa-lg fa-building-o" groups="base.group_no_one" role="img"/>
+                                    <div class="text-muted">
+                                        Connection
+                                    </div>
+                                    <div class="content-group">
+                                        <div class="row mt16">
+                                            <label for="mgs_username" class="col-lg-3 o_light_label"/>
+                                            <field name="mgs_username"/>
+                                        </div>
+                                        <div class="row mt16">
+                                            <label for="mgs_password" class="col-lg-3 o_light_label"/>
+                                            <field name="mgs_password"/>
+                                        </div>
+                                        <div class="row mt16">
+                                            <label for="mgs_sender" class="col-lg-3 o_light_label"/>
+                                            <field name="mgs_sender"/>
+                                        </div>
+                                        <div class="row mt16">
+                                            <label for="mgs_key" class="col-lg-3 o_light_label"/>
+                                            <field name="mgs_key"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="sms_settings_view_action" model="ir.actions.act_window">
+            <field name="name">Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="context">{'module' : 'mgs_sms_integration'}</field>
+        </record>
+
+
+
+
+
+        <menuitem id="mgs_sms_integration_root" web_icon="mgs_sms_integration,static/description/icon.png"
+          name="MGS SMS" groups="base.group_no_one"/>
+
+          <menuitem id="sms_configuration_menu"
+            name="Settings" parent="mgs_sms_integration_root" action="sms_settings_view_action"
+            sequence="2" groups="base.group_no_one"/>
+
+    </data>
+</odoo>
