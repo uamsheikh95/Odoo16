@@ -196,51 +196,51 @@ class AccountPayment(models.Model):
         return res
 
 
-# class ResCompany(models.Model):
-#     _inherit = 'res.company'
+class ResCompany(models.Model):
+    _inherit = 'res.company'
 
-#     sms_type = fields.Selection(
-#         [('Telesom', 'Telesom'), ('Golis', 'Golis')], default='Telesom', string="SMS Type")
+    sms_type = fields.Selection(
+        [('Telesom', 'Telesom'), ('Golis', 'Golis')], default='Telesom', string="SMS Type")
 
-#     mgs_username = fields.Char(
-#         string='Telesom Username')
-#     mgs_password = fields.Char(
-#         string='Telesom Password')
-#     mgs_sender = fields.Char(string='Telesom Sender Name')
-#     mgs_key = fields.Char(
-#         string='Telesom SMS Key')
+    mgs_username = fields.Char(
+        string='Telesom Username')
+    mgs_password = fields.Char(
+        string='Telesom Password')
+    mgs_sender = fields.Char(string='Telesom Sender Name')
+    mgs_key = fields.Char(
+        string='Telesom SMS Key')
 
-#     mgs_golis_sender = fields.Char(
-#         string='Golis Sender Name')
-#     mgs_golis_token = fields.Char(
-#         string='Golis Key')
-#     mgs_golis_overwrite_odoo_sms = fields.Boolean(
-#         string='Golis Overwrite odoo sms', default=True)
+    mgs_golis_sender = fields.Char(
+        string='Golis Sender Name')
+    mgs_golis_token = fields.Char(
+        string='Golis Key')
+    mgs_golis_overwrite_odoo_sms = fields.Boolean(
+        string='Golis Overwrite odoo sms', default=True)
 
 
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    # sms_type = fields.Selection(
-    #     [('Telesom', 'Telesom'), ('Golis', 'Golis')], related='company_id.sms_type', readonly=False, string="SMS Type")
+    sms_type = fields.Selection(
+        [('Telesom', 'Telesom'), ('Golis', 'Golis')], related='company_id.sms_type', readonly=False, string="SMS Type")
 
-    # # ------------------------------------------- Telesom -------------------------------------------
-    # mgs_username = fields.Char(
-    #     string='Telesom Username', related="company_id.mgs_username", readonly=False)
-    # mgs_password = fields.Char(
-    #     string='Telesom Password', related="company_id.mgs_password", readonly=False)
-    # mgs_sender = fields.Char(
-    #     string='Telesom Sender Name', related="company_id.mgs_sender", readonly=False)
-    # mgs_key = fields.Char(
-    #     string='Telesom Key', related="company_id.mgs_key", readonly=False)
+    # ------------------------------------------- Telesom -------------------------------------------
+    mgs_username = fields.Char(
+        string='Telesom Username', related="company_id.mgs_username", readonly=False)
+    mgs_password = fields.Char(
+        string='Telesom Password', related="company_id.mgs_password", readonly=False)
+    mgs_sender = fields.Char(
+        string='Telesom Sender Name', related="company_id.mgs_sender", readonly=False)
+    mgs_key = fields.Char(
+        string='Telesom Key', related="company_id.mgs_key", readonly=False)
 
-    # # -------------------------------------------  Golis  -------------------------------------------
-    # mgs_golis_sender = fields.Char(
-    #     string='Golis Sender Name', related="company_id.mgs_golis_sender")
-    # mgs_golis_token = fields.Char(
-    #     string='Golis Key', related="company_id.mgs_golis_token")
-    # mgs_golis_overwrite_odoo_sms = fields.Boolean(
-    #     string='Golis Overwrite odoo sms', default=True, related="company_id.mgs_golis_overwrite_odoo_sms")
+    # -------------------------------------------  Golis  -------------------------------------------
+    mgs_golis_sender = fields.Char(
+        string='Golis Sender Name', related="company_id.mgs_golis_sender")
+    mgs_golis_token = fields.Char(
+        string='Golis Key', related="company_id.mgs_golis_token")
+    mgs_golis_overwrite_odoo_sms = fields.Boolean(
+        string='Golis Overwrite odoo sms', default=True, related="company_id.mgs_golis_overwrite_odoo_sms")
 
     # @api.model
     # def set_values(self):
