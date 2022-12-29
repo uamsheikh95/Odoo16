@@ -140,7 +140,7 @@ class AccountMove(models.Model):
 
                 invoice_number = rec.name.replace('/', '-')
                 msg = 'INVOICE: Macamiil waxa xisaabtaada lagu dalacay iib dhan USD %s tixraac %s deyntaada cusbi waa USD %s' % (
-                    '{:,}'.format(rec.amount_total), invoice_number, '{:,}'.format(partner_balance))
+                    '{:,}'.format(rec.amount_total), invoice_number, '{:,}'.format(int(partner_balance)))
                 to = rec.partner_id.mobile or None
                 sms_record = mgs_sms_obj.create({'source_name': rec.name, 'message': msg, 'mobile': to,
                                                 'partner_id': rec.partner_id.id, 'model_id': model_obj, 'datetime': datetime.now()})
