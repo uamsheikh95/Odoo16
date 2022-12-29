@@ -30,9 +30,8 @@ class MgsSms(models.Model):
                             select COALESCE(sum(aml.debit - aml.credit), 0)
                             from account_move_line as aml
                             left join account_account as aa on aml.account_id=aa.id
-                            left join account_account_type as aat on aa.user_type_id=aat.id
                             where aml.partner_id = %s""" % str(id) + """
-                            and aat.name = 'Receivable'
+                            and aa.account_type = 'asset_receivable'
                             and parent_state in ('draft', 'posted')"""
         self.env.cr.execute(partner_balance)
         contemp = self.env.cr.fetchone()
