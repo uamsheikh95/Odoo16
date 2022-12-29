@@ -199,6 +199,9 @@ class AccountPayment(models.Model):
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
+    sms_type = fields.Selection(
+        [('Telesom', 'Telesom'), ('Golis', 'Golis')], default='Telesom', string="SMS Type")
+
     mgs_username = fields.Char(
         string='Telesom Username')
     mgs_password = fields.Char(
@@ -219,7 +222,7 @@ class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
     sms_type = fields.Selection(
-        [('Telesom', 'Telesom'), ('Golis', 'Golis')], default='Telesom')
+        [('Telesom', 'Telesom'), ('Golis', 'Golis')], related='company_id.sms_type', readonly=False, string="SMS Type")
 
     # ------------------------------------------- Telesom -------------------------------------------
     mgs_username = fields.Char(
